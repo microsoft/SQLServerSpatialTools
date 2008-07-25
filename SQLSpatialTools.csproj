@@ -46,11 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocateAlongGeometrySink.cs" />
+    <Compile Include="Sinks\LocateAlongGeometrySink.cs" />
     <Compile Include="Functions.cs" />
-    <Compile Include="LocateAlongGeographySink.cs" />
+    <Compile Include="Sinks\LocateAlongGeographySink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShiftGeometrySink.cs" />
+    <Compile Include="Sinks\ShiftGeometrySink.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
