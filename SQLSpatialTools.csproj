@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30708</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -46,12 +46,52 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sinks\VacuousGeographyToGeometrySink.cs" />
+    <Compile Include="Sinks\VacuousGeometryToGeographySink.cs" />
+    <Compile Include="Types\AffineTransform.cs" />
+    <Compile Include="Aggregates\GeometryEnvelopeAggregate.cs" />
+    <Compile Include="Aggregates\GeographyUnionAggregate.cs" />
+    <Compile Include="Projections\AlbersEqualAreaProjection.cs" />
+    <Compile Include="Projections\EquirectangularProjection.cs" />
+    <Compile Include="Projections\LambertConformalConicProjection.cs" />
+    <Compile Include="Projections\MathX.cs" />
+    <Compile Include="Projections\MercatorProjection.cs" />
+    <Compile Include="Projections\ObliqueMercatorProjection.cs" />
+    <Compile Include="Projections\Projection.cs" />
+    <Compile Include="Resource.Designer.cs" />
+    <Compile Include="Sinks\GeometryTransformer.cs" />
+    <Compile Include="Types\SqlProjection.cs" />
+    <Compile Include="Projections\TranverseMercatorProjection.cs" />
+    <Compile Include="Sinks\DensifyGeographySink.cs" />
     <Compile Include="Sinks\LocateAlongGeometrySink.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Sinks\LocateAlongGeographySink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sinks\Projector.cs" />
     <Compile Include="Sinks\ShiftGeometrySink.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="Sinks\Unprojector.cs" />
+    <Compile Include="Utility\Util.cs" />
+    <Compile Include="Utility\Vector3.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SQL Scripts\aggregate_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\projection_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\Register.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\transform_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\Unregister.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

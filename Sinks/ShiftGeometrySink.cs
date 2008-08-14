@@ -10,10 +10,9 @@ namespace SQLSpatialTools
      */
     public class ShiftGeometrySink : IGeometrySink
     {
-        IGeometrySink _target;  // the target sink
-        double _xShift;         // How much to shift in the x direction.
-        double _yShift;         // How much to shift in the y direction.
-
+        private readonly IGeometrySink _target;  // the target sink
+		private readonly double _xShift;         // How much to shift in the x direction.
+		private readonly double _yShift;         // How much to shift in the y direction.
 
         // We take an amount to shift in the x and y directions, as well as a target sink, to which
         // we will pipe our result.
