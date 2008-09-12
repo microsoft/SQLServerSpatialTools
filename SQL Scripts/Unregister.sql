@@ -6,6 +6,7 @@ go
 
 -- Drop the aggregates...
 drop aggregate GeometryEnvelopeAggregate
+drop aggregate GeographyCollectionAggregate
 drop aggregate GeographyUnionAggregate
 
 -- Drop the functions...

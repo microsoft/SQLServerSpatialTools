@@ -60,6 +60,10 @@ create aggregate GeometryEnvelopeAggregate(@geom geometry) returns geometry
 external name SQLSpatialTools.[SQLSpatialTools.GeometryEnvelopeAggregate]
 go
 
-create aggregate GeographyUnionAggregate(@geog geography, @bufferDistance float) returns geography
+create aggregate GeographyCollectionAggregate(@geog geography) returns geography
+external name SQLSpatialTools.[SQLSpatialTools.GeographyCollectionAggregate]
+go
+
+create aggregate GeographyUnionAggregate(@geog geography) returns geography
 external name SQLSpatialTools.[SQLSpatialTools.GeographyUnionAggregate]
 go
