@@ -68,6 +68,19 @@ These static methods, implemented in the class Functions, can both be
 registered in SQL Server and used through T-SQL, as well as be used
 directly from the CLR:
 
+bool IsValidGeography(string inputWKT, int srid)
+Check if input WKT represents a valid geography without throwing an exception.
+
+SqlGeography MakeValidGeography(string inputWKT, int srid)
+Tries to fix problems with an invalid geography by projecting it using gnomonic projection and running planar make valid.
+
+SqlGeography ConvexHullGeography(SqlGeography geog)
+Computes ConvexHull of input geography by projecting it using gnomonic projection and running planar convex hull.
+
+SqlGeography ConvexHullGeographyFromText(string inputWKT, int srid)
+Computes ConvexHull of input geography by projecting it using gnomonic projection and running planar convex hull.
+This function does not require its input to be a valid geography.
+
 SqlGeography DensifyGeography(SqlGeography g, double maxAngle)
 Returns a geography instance equivalent to its input, but with no two
 consecutive points spaced more than maxAngle apart.
@@ -118,6 +131,7 @@ its use. Currently supported projections are:
     * Mercator
     * Oblique Mercator
     * Tranverse Mercator
+    * Gnomonic
 
 
 AffineTransform
