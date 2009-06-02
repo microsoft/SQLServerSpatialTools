@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.SqlServer.Types;
+using System.Data.SqlTypes;
 
 namespace SQLSpatialTools
 {
@@ -9,7 +10,6 @@ namespace SQLSpatialTools
 	public class Functions
 	{
 		const double THRESHOLD = .01;  // 1 cm tolerance in most SRIDs
-
 
 		// Make our ShiftGeometrySink into a function call by hooking it into a simple pipeline.
 		public static SqlGeometry ShiftGeometry(SqlGeometry g, double xShift, double yShift)
@@ -36,7 +36,6 @@ namespace SQLSpatialTools
 			g.Populate(p);
 			return b.ConstructedGeography;
 		}
-
 
 		// Make our LocateAlongGeometrySink into a function call.  This function just hooks up
 		// and runs a pipeline using the sink.
@@ -183,5 +182,78 @@ namespace SQLSpatialTools
 			return b.ConstructedGeometry;
 		}
 
+		// The convex hull of a valid geography object
+		// Algorithm:
+		//   1) Project the object using a gnomonic projection
+		//   2) Run planar make valid to fix any minor projection-related errors
+		//   3) Run planar convex hull
+		//   4) Unproject the result using same projection
+		//
+		public static SqlGeography ConvexHullGeography(SqlGeography geography)
+		{
+			SqlGeography center = geography.EnvelopeCenter();
+			SqlProjection gnomonicProjection = SqlProjection.Gnomonic(center.Long.Value, center.Lat.Value);
+			SqlGeometry geometry = gnomonicProjection.Project(geography);
+			return gnomonicProjection.Unproject(geometry.MakeValid().STConvexHull());
+		}
+
+		// More general convex hull
+		//
+		// Even if input object is not valid, we extract its points
+		// and try to compute their convex hull.
+		//
+		// This function is useful for computing the convex hull of an object
+		// which contains inconsistently oriented rings
+		//
+		public static SqlGeography ConvexHullGeographyFromText(string inputWKT, int srid)
+		{
+			SqlGeometry geometry = SqlGeometry.STGeomFromText(new SqlChars(inputWKT), srid);
+			SqlGeographyBuilder geographyBuilder = new SqlGeographyBuilder();
+			geometry.Populate(new GeometryToPointGeographySink(geographyBuilder));
+			return ConvexHullGeography(geographyBuilder.ConstructedGeography);
+		}
+
+		// Check if input WKT represents a valid geography without throwing an exception.
+		//
+		public static bool IsValidGeography(string inputWKT, int srid)
+		{
+			try
+			{
+				// If parse succeeds then our input is valid
+				SqlGeography.STGeomFromText(new SqlChars(inputWKT), srid);
+				return true;
+			}
+			catch (FormatException)
+			{
+				// Syntax error
+				return false;
+			}
+			catch (ArgumentException)
+			{
+				// Geometrical error
+				return false;
+			}
+		}
+
+		// Tries to fix problems with an invalid geography by projecting it
+		// using gnomonic projectiong and running planar make valid.
+		//
+		public static SqlGeography MakeValidGeography(string inputWKT, int srid)
+		{
+			SqlGeometry inputGeometry = SqlGeometry.STGeomFromText(new SqlChars(inputWKT), srid);
+
+			// Extract vertices from our input to be able to compute geography EnvelopeCenter
+			SqlGeographyBuilder pointSetBuilder = new SqlGeographyBuilder();
+			inputGeometry.Populate(new GeometryToPointGeographySink(pointSetBuilder));
+			SqlGeography center = pointSetBuilder.ConstructedGeography.EnvelopeCenter();
+
+			// Construct Gnomonic projection centered on input geography
+			SqlProjection gnomonicProjection = SqlProjection.Gnomonic(center.Long.Value, center.Lat.Value);
+
+			// Project, run geometry MakeValid and unproject
+			SqlGeometryBuilder geometryBuilder = new SqlGeometryBuilder();
+			inputGeometry.Populate(new VacuousGeometryToGeographySink(srid, new Projector(gnomonicProjection, geometryBuilder)));
+			return gnomonicProjection.Unproject(geometryBuilder.ConstructedGeometry.MakeValid());
+		}
 	}
 }

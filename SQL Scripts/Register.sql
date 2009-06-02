@@ -1,17 +1,13 @@
 ﻿-- Copyright (c) Microsoft Corporation.  All rights reserved.
 
--- Insert your database
-use []
-go
-
+-- Install the SQLSpatialTools assembly and all its functions into the current database
 
 -- Enable CLR
 sp_configure 'clr enabled', 1
 reconfigure
 go
 
-
--- Insert the path to the SQLSpatialTools assesmbly here
+-- !!! Insert the path to the SQLSpatialTools assembly here !!!
 create assembly SQLSpatialTools from '' 
 go
 
@@ -53,6 +49,21 @@ create function VacuousGeographyToGeometry(@toConvert geography, @targetSrid int
 as external name SQLSpatialTools.[SQLSpatialTools.Functions].VacuousGeographyToGeometry
 go
 
+create function ConvexHullGeography(@geog geography) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].ConvexHullGeography
+go
+
+create function ConvexHullGeographyFromText(@inputWKT nvarchar(max), @srid int) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].ConvexHullGeographyFromText
+go
+
+create function IsValidGeography(@inputWKT nvarchar(max), @srid int) returns bit
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].IsValidGeography
+go
+
+create function MakeValidGeography(@inputWKT nvarchar(max), @srid int) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].MakeValidGeography
+go
 
 -- Create aggregates.
 

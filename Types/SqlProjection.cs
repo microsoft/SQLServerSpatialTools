@@ -167,6 +167,16 @@ namespace SQLSpatialTools
 			return new SqlProjection(new TranverseMercatorProjection(parameters));
 		}
 
+		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
+		public static SqlProjection Gnomonic(double longitude, double latitude)
+		{
+			Dictionary<String, double> parameters = new Dictionary<string, double>();
+			parameters["longitude0"] = 0;
+			parameters["longitude1"] = longitude;
+			parameters["latitude1"] = latitude;
+			return new SqlProjection(new GnommonicProjection(parameters));
+		}
+
 		private static void ThrowIfArgumentNull(INullable argument, string name)
 		{
 			if (argument == null || argument.IsNull)
@@ -242,7 +252,7 @@ namespace SQLSpatialTools
 
 		// Longitude and latitude are in degrees.
 		// Output Latitude will be in range [-90, 90].
-		// Output Longitude will be in range [-180, 180).
+		// Output Longitude will be in range [-180, 180].
 		//
 		public void UnprojectPoint(double x, double y, out double latitudeDeg, out double longitudeDeg)
 		{
@@ -262,7 +272,7 @@ namespace SQLSpatialTools
 			{
 				throw new ArgumentOutOfRangeException("latitude", String.Format(CultureInfo.InvariantCulture, Resource.OutputLatitudeIsOutOfRange, latitude));
 			}
-			if (Double.IsNaN(longitude) || longitude < -Math.PI || longitude >= Math.PI)
+			if (Double.IsNaN(longitude) || longitude < -Math.PI || longitude > Math.PI)
 			{
 				throw new ArgumentOutOfRangeException("longitude", String.Format(CultureInfo.InvariantCulture, Resource.OutputLongitudeIsOutOfRange, longitude));
 			}

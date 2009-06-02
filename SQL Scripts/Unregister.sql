@@ -1,8 +1,6 @@
 ﻿-- Copyright (c) Microsoft Corporation.  All rights reserved.
 
--- Insert your database
-use []
-go
+-- Drop the SQLSpatialTools assembly and all its functions from the current database
 
 -- Drop the aggregates...
 drop aggregate GeometryEnvelopeAggregate
@@ -17,6 +15,11 @@ drop function InterpolateBetweenGeog
 drop function InterpolateBetweenGeom
 drop function VacuousGeometryToGeography
 drop function VacuousGeographyToGeometry
+
+drop function ConvexHullGeography
+drop function ConvexHullGeographyFromText
+drop function IsValidGeography
+drop function MakeValidGeography
 
 -- Drop the types...
 drop type Projection

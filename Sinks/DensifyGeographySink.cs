@@ -43,7 +43,7 @@ namespace SQLSpatialTools
         public void AddLine(double latitude, double longitude, double? z, double? m)
         {
             // Transforming from geodetic coordinates to a unit vector.
-			Vector3 endPoint = Util.SphericalToCartesian(latitude, longitude);
+			Vector3 endPoint = Util.SphericalDegToCartesian(latitude, longitude);
 
             double angle = endPoint.Angle(_startPoint);
             if (angle > MinAngle)
@@ -93,7 +93,7 @@ namespace SQLSpatialTools
         public void BeginFigure(double latitude, double longitude, double? z, double? m)
         {
             // Starting the figure, remembering the vector that corresponds to the first point.
-			_startPoint = Util.SphericalToCartesian(latitude, longitude);
+			_startPoint = Util.SphericalDegToCartesian(latitude, longitude);
             _sink.BeginFigure(latitude, longitude, z, m);
         }
 
