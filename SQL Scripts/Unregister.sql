@@ -18,8 +18,10 @@ drop function VacuousGeographyToGeometry
 
 drop function ConvexHullGeography
 drop function ConvexHullGeographyFromText
-drop function IsValidGeography
-drop function MakeValidGeography
+drop function IsValidGeographyFromGeometry
+drop function IsValidGeographyFromText
+drop function MakeValidGeographyFromGeometry
+drop function MakeValidGeographyFromText
 
 -- Drop the types...
 drop type Projection

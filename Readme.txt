@@ -68,18 +68,37 @@ These static methods, implemented in the class Functions, can both be
 registered in SQL Server and used through T-SQL, as well as be used
 directly from the CLR:
 
-bool IsValidGeography(string inputWKT, int srid)
-Check if input WKT represents a valid geography without throwing an exception.
+bool IsValidGeographyFromGeometry(SqlGeometry geometry)
+Check if an input geometry can represent a valid geography without throwing an exception.
+This function requires that the geometry be in longitude/latitude coordinates and that
+those coordinates are in correct order in the geometry instance (i.e. latitude/longitude
+not longitude/latitude). This function will return false (0) if the input geometry is not
+in the correct latitude/longitude format, including a valid geography SRID.
 
-SqlGeography MakeValidGeography(string inputWKT, int srid)
-Tries to fix problems with an invalid geography by projecting it using gnomonic projection and running planar make valid.
+bool IsValidGeographyFromText(string inputWKT, int srid)
+Check if an input WKT can represent a valid geography. This function requires that
+the WTK coordinate values are longitude/latitude values, in that order and that a valid
+geography SRID value is supplied.  This function will not throw an exception even in
+edge conditions (i.e. longitude/latitude coordinates are reversed to latitude/longitude).
 
-SqlGeography ConvexHullGeography(SqlGeography geog)
-Computes ConvexHull of input geography by projecting it using gnomonic projection and running planar convex hull.
+SqlGeography MakeValidGeographyFromGeometry(SqlGeometry geometry)
+Convert an input geometry instance to a valid geography instance.
+This function requires that the WKT coordinate values are longitude/latitude values,
+in that order and that a valid geography SRID value is supplied.
+
+SqlGeography MakeValidGeographyFromText(string inputWKT, int srid)
+Convert an input WKT to a valid geography instance.
+This function requires that the WKT coordinate values are longitude/latitude values,
+in that order and that a valid geography SRID value is supplied.
+
+SqlGeography ConvexHullGeography(SqlGeography geography)
+Computes ConvexHull of input geography and returns a polygon (unless all input points are colinear).
 
 SqlGeography ConvexHullGeographyFromText(string inputWKT, int srid)
-Computes ConvexHull of input geography by projecting it using gnomonic projection and running planar convex hull.
-This function does not require its input to be a valid geography.
+Computes ConvexHull of input WKT and returns a polygon (unless all input points are colinear).
+This function does not require its input to be a valid geography. This function does require
+that the WKT coordinate values are longitude/latitude values, in that order and that a valid
+geography SRID value is supplied.
 
 SqlGeography DensifyGeography(SqlGeography g, double maxAngle)
 Returns a geography instance equivalent to its input, but with no two

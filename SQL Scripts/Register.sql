@@ -57,12 +57,20 @@ create function ConvexHullGeographyFromText(@inputWKT nvarchar(max), @srid int) 
 as external name SQLSpatialTools.[SQLSpatialTools.Functions].ConvexHullGeographyFromText
 go
 
-create function IsValidGeography(@inputWKT nvarchar(max), @srid int) returns bit
-as external name SQLSpatialTools.[SQLSpatialTools.Functions].IsValidGeography
+create function IsValidGeographyFromGeometry(@inputGeometry geometry) returns bit
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].IsValidGeographyFromGeometry
 go
 
-create function MakeValidGeography(@inputWKT nvarchar(max), @srid int) returns geography
-as external name SQLSpatialTools.[SQLSpatialTools.Functions].MakeValidGeography
+create function IsValidGeographyFromText(@inputWKT nvarchar(max), @srid int) returns bit
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].IsValidGeographyFromText
+go
+
+create function MakeValidGeographyFromGeometry(@inputGeometry geometry) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].MakeValidGeographyFromGeometry
+go
+
+create function MakeValidGeographyFromText(@inputWKT nvarchar(max), @srid int) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].MakeValidGeographyFromText
 go
 
 -- Create aggregates.

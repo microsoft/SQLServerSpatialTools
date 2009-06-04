@@ -182,12 +182,7 @@ namespace SQLSpatialTools
 			return b.ConstructedGeometry;
 		}
 
-		// The convex hull of a valid geography object
-		// Algorithm:
-		//   1) Project the object using a gnomonic projection
-		//   2) Run planar make valid to fix any minor projection-related errors
-		//   3) Run planar convex hull
-		//   4) Unproject the result using same projection
+		// Computes ConvexHull of input geography and returns a polygon (unless all input points are colinear).
 		//
 		public static SqlGeography ConvexHullGeography(SqlGeography geography)
 		{
@@ -197,13 +192,10 @@ namespace SQLSpatialTools
 			return gnomonicProjection.Unproject(geometry.MakeValid().STConvexHull());
 		}
 
-		// More general convex hull
-		//
-		// Even if input object is not valid, we extract its points
-		// and try to compute their convex hull.
-		//
-		// This function is useful for computing the convex hull of an object
-		// which contains inconsistently oriented rings
+		// Computes ConvexHull of input WKT and returns a polygon (unless all input points are colinear).
+		// This function does not require its input to be a valid geography. This function does require
+		// that the WKT coordinate values are longitude/latitude values, in that order and that a valid
+		// geography SRID value is supplied.
 		//
 		public static SqlGeography ConvexHullGeographyFromText(string inputWKT, int srid)
 		{
@@ -213,9 +205,39 @@ namespace SQLSpatialTools
 			return ConvexHullGeography(geographyBuilder.ConstructedGeography);
 		}
 
-		// Check if input WKT represents a valid geography without throwing an exception.
+		// Check if an input geometry can represent a valid geography without throwing an exception.
+		// This function requires that the geometry be in longitude/latitude coordinates and that
+		// those coordinates are in correct order in the geometry instance (i.e. latitude/longitude
+		// not longitude/latitude). This function will return false (0) if the input geometry is not
+		// in the correct latitude/longitude format, including a valid geography SRID.
 		//
-		public static bool IsValidGeography(string inputWKT, int srid)
+		public static bool IsValidGeographyFromGeometry(SqlGeometry geometry)
+		{
+			try
+			{
+				SqlGeographyBuilder builder = new SqlGeographyBuilder();
+				geometry.Populate(new VacuousGeometryToGeographySink(geometry.STSrid.Value, builder));
+				SqlGeography geography = builder.ConstructedGeography;
+				return true;
+			}
+			catch (FormatException)
+			{
+				// Syntax error
+				return false;
+			}
+			catch (ArgumentException)
+			{
+				// Semantical (Geometrical) error
+				return false;
+			}
+		}
+
+		// Check if an input WKT can represent a valid geography. This function requires that
+		// the WTK coordinate values are longitude/latitude values, in that order and that a valid
+		// geography SRID value is supplied.  This function will not throw an exception even in
+		// edge conditions (i.e. longitude/latitude coordinates are reversed to latitude/longitude).
+		//
+		public static bool IsValidGeographyFromText(string inputWKT, int srid)
 		{
 			try
 			{
@@ -230,21 +252,20 @@ namespace SQLSpatialTools
 			}
 			catch (ArgumentException)
 			{
-				// Geometrical error
+				// Semantical (Geometrical) error
 				return false;
 			}
 		}
 
-		// Tries to fix problems with an invalid geography by projecting it
-		// using gnomonic projectiong and running planar make valid.
+		// Convert an input geometry instance to a valid geography instance.
+		// This function requires that the WKT coordinate values are longitude/latitude values,
+		// in that order and that a valid geography SRID value is supplied.
 		//
-		public static SqlGeography MakeValidGeography(string inputWKT, int srid)
+		public static SqlGeography MakeValidGeographyFromGeometry(SqlGeometry geometry)
 		{
-			SqlGeometry inputGeometry = SqlGeometry.STGeomFromText(new SqlChars(inputWKT), srid);
-
 			// Extract vertices from our input to be able to compute geography EnvelopeCenter
 			SqlGeographyBuilder pointSetBuilder = new SqlGeographyBuilder();
-			inputGeometry.Populate(new GeometryToPointGeographySink(pointSetBuilder));
+			geometry.Populate(new GeometryToPointGeographySink(pointSetBuilder));
 			SqlGeography center = pointSetBuilder.ConstructedGeography.EnvelopeCenter();
 
 			// Construct Gnomonic projection centered on input geography
@@ -252,8 +273,17 @@ namespace SQLSpatialTools
 
 			// Project, run geometry MakeValid and unproject
 			SqlGeometryBuilder geometryBuilder = new SqlGeometryBuilder();
-			inputGeometry.Populate(new VacuousGeometryToGeographySink(srid, new Projector(gnomonicProjection, geometryBuilder)));
+			geometry.Populate(new VacuousGeometryToGeographySink(geometry.STSrid.Value, new Projector(gnomonicProjection, geometryBuilder)));
 			return gnomonicProjection.Unproject(geometryBuilder.ConstructedGeometry.MakeValid());
+		}
+
+		// Convert an input WKT to a valid geography instance.
+		// This function requires that the WKT coordinate values are longitude/latitude values,
+		// in that order and that a valid geography SRID value is supplied.
+		//
+		public static SqlGeography MakeValidGeographyFromText(string inputWKT, int srid)
+		{
+			return MakeValidGeographyFromGeometry(SqlGeometry.STGeomFromText(new SqlChars(inputWKT), srid));
 		}
 	}
 }
