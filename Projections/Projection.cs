@@ -69,7 +69,12 @@ namespace SQLSpatialTools
 		//
 		protected internal double InputLatitude(string name)
 		{
-			return MathX.InputLat(_parameters[name], 89.9, name);
+			return InputLatitude(name, 89.9);
+		}
+
+		protected internal double InputLatitude(string name, double max)
+		{
+			return MathX.InputLat(_parameters[name], max, name);
 		}
 
 		// Used for validation and conversion of projection input parameters.
@@ -81,7 +86,12 @@ namespace SQLSpatialTools
 		//
 		protected internal double InputLongitude(string name)
 		{
-			return MathX.InputLong(_parameters[name], 360, name);
+			return InputLongitude(name, 360);
+		}
+
+		protected internal double InputLongitude(string name, double max)
+		{
+			return MathX.InputLong(_parameters[name], max, name);
 		}
 
 		// Longitude and latitude are in radians.

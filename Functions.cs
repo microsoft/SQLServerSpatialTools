@@ -186,6 +186,8 @@ namespace SQLSpatialTools
 		//
 		public static SqlGeography ConvexHullGeography(SqlGeography geography)
 		{
+			if (geography.IsNull || geography.STIsEmpty().Value) return geography;
+
 			SqlGeography center = geography.EnvelopeCenter();
 			SqlProjection gnomonicProjection = SqlProjection.Gnomonic(center.Long.Value, center.Lat.Value);
 			SqlGeometry geometry = gnomonicProjection.Project(geography);
@@ -213,6 +215,8 @@ namespace SQLSpatialTools
 		//
 		public static bool IsValidGeographyFromGeometry(SqlGeometry geometry)
 		{
+			if (geometry.IsNull) return false;
+
 			try
 			{
 				SqlGeographyBuilder builder = new SqlGeographyBuilder();
@@ -263,10 +267,22 @@ namespace SQLSpatialTools
 		//
 		public static SqlGeography MakeValidGeographyFromGeometry(SqlGeometry geometry)
 		{
+			if (geometry.IsNull) return SqlGeography.Null;
+			if (geometry.STIsEmpty().Value) return CreateEmptyGeography(geometry.STSrid.Value);
+
 			// Extract vertices from our input to be able to compute geography EnvelopeCenter
 			SqlGeographyBuilder pointSetBuilder = new SqlGeographyBuilder();
 			geometry.Populate(new GeometryToPointGeographySink(pointSetBuilder));
-			SqlGeography center = pointSetBuilder.ConstructedGeography.EnvelopeCenter();
+			SqlGeography center;
+			try
+			{
+				center = pointSetBuilder.ConstructedGeography.EnvelopeCenter();
+			}
+			catch (ArgumentException)
+			{
+				// Input is larger than a hemisphere.
+				return SqlGeography.Null;
+			}
 
 			// Construct Gnomonic projection centered on input geography
 			SqlProjection gnomonicProjection = SqlProjection.Gnomonic(center.Long.Value, center.Lat.Value);
@@ -274,7 +290,49 @@ namespace SQLSpatialTools
 			// Project, run geometry MakeValid and unproject
 			SqlGeometryBuilder geometryBuilder = new SqlGeometryBuilder();
 			geometry.Populate(new VacuousGeometryToGeographySink(geometry.STSrid.Value, new Projector(gnomonicProjection, geometryBuilder)));
-			return gnomonicProjection.Unproject(geometryBuilder.ConstructedGeometry.MakeValid());
+			SqlGeometry outGeometry = MakeValidForGeography(geometryBuilder.ConstructedGeometry);
+
+			try
+			{
+				return gnomonicProjection.Unproject(outGeometry);
+			}
+			catch (ArgumentException)
+			{
+				// Try iteratively to reduce the object to remove very close vertices.
+				for (double tollerance = 1e-4; tollerance <= 1e6; tollerance *= 2)
+				{
+					try
+					{
+						return gnomonicProjection.Unproject(outGeometry.Reduce(tollerance));
+					}
+					catch (ArgumentException)
+					{
+						// keep trying
+					}
+				}
+				return SqlGeography.Null;
+			}
+		}
+
+		private static SqlGeography CreateEmptyGeography(int srid)
+		{
+			SqlGeographyBuilder b = new SqlGeographyBuilder();
+			b.SetSrid(srid);
+			b.BeginGeography(OpenGisGeographyType.GeometryCollection);
+			b.EndGeography();
+			return b.ConstructedGeography;
+		}
+
+		private static SqlGeometry MakeValidForGeography(SqlGeometry geometry)
+		{
+			// Note: This function relies on an undocumented feature of the planar Union and MakeValid
+			// that polygon rings in their result will always be oriented using the same rule that
+			// is used in geography. But, it is not good practice to rely on such fact in production code.
+
+			if (geometry.STIsValid().Value && !geometry.STIsEmpty().Value)
+				return geometry.STUnion(geometry.STPointN(1));
+	
+			return geometry.MakeValid();
 		}
 
 		// Convert an input WKT to a valid geography instance.

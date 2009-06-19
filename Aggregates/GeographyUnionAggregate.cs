@@ -42,9 +42,13 @@ namespace SQLSpatialTools
 
 		public SqlGeography Terminate()
 		{
-			// force self union of the collection
 			SqlGeography g = aggregate.Terminate();
-			return g.STNumPoints().Value == 0 ? g : g.STUnion(g.STPointN(1));
+
+			if (g.IsNull || g.STIsEmpty().Value)
+				return g;
+
+			// force self union of the collection
+			return g.STUnion(g.STPointN(1));
 		}
 
 		public void Read(BinaryReader r)
@@ -73,18 +77,25 @@ namespace SQLSpatialTools
 		private SqlGeographyBuilder m_builder;
 		private IGeographySink m_sink;
 		private int m_srid;
+		private bool m_error;
 
 		public void Init()
 		{
 			m_srid = -1;
 			m_builder = null;
 			m_sink = null;
+			m_error = false;
+		}
+
+		private bool IsInitialState()
+		{
+			return m_builder == null && !m_error;
 		}
 
 		public void Accumulate(SqlGeography g)
 		{
-			Debug.Assert(g != null && !g.IsNull);
-			Reset(g.STSrid.Value);			
+			if (g == null || g.IsNull || m_error) return;
+			Reset(g.STSrid.Value);
 			g.Populate(m_sink);
 		}
 
@@ -98,24 +109,58 @@ namespace SQLSpatialTools
 				m_builder.BeginGeography(OpenGisGeographyType.GeometryCollection);
 				m_sink = new StripSRID(m_builder);
 			}
-			else if (srid != m_srid) throw new Exception("different SRIDs");
+			else if (srid != m_srid)
+			{
+				m_srid = -1;
+				m_builder = null;
+				m_sink = null;
+				m_error = true;
+			}
+		}
+
+		private SqlGeography ConstructedGeography()
+		{
+			SqlGeography g = SqlGeography.Null;
+			if (!m_error)
+			{
+				try
+				{
+					m_builder.EndGeography();
+					g = m_builder.ConstructedGeography;
+				}
+				catch (ArgumentException)
+				{
+					// Result is larger than a hemisphere!
+				}
+			}
+			Init();
+			return g;
 		}
 
 		public void Merge(GeographyCollectionAggregate group)
 		{
-			if (group.m_builder == null) return;
-			group.m_builder.EndGeography();
-			SqlGeography g = m_builder.ConstructedGeography;
-			group.Init();
-			Reset(g.STSrid.Value);
-			g.Populate(new StripCollection(m_builder));
+			if (group.IsInitialState()) return;
+
+			SqlGeography g = group.ConstructedGeography();
+			if (g.IsNull)
+			{
+				m_srid = -1;
+				m_builder = null;
+				m_sink = null;
+				m_error = true;
+			}
+			else
+			{
+				Reset(g.STSrid.Value);
+				g.Populate(new StripCollection(m_builder));
+			}
 		}
 
 		public SqlGeography Terminate()
 		{
-			if (m_builder == null) return null;
-			m_builder.EndGeography();
-			SqlGeography g = m_builder.ConstructedGeography;
+			if (IsInitialState()) return SqlGeography.Null;
+
+			SqlGeography g = ConstructedGeography();
 			Init();
 			return g;
 		}
@@ -130,23 +175,31 @@ namespace SQLSpatialTools
 			{
 				SqlGeography g = new SqlGeography();
 				g.Read(r);
-				m_srid = g.STSrid.Value;
-				m_builder = new SqlGeographyBuilder();
-				m_sink = new StripSRID(m_builder);
-				m_builder.SetSrid(m_srid);
-				m_builder.BeginGeography(OpenGisGeographyType.GeometryCollection);
-				g.Populate(new StripCollection(m_builder));
+				if (g.IsNull)
+				{
+					m_srid = -1;
+					m_error = true;
+					m_builder = null;
+					m_sink = null;
+				}
+				else
+				{
+					m_srid = g.STSrid.Value;
+					m_builder = new SqlGeographyBuilder();
+					m_sink = new StripSRID(m_builder);
+					m_builder.SetSrid(m_srid);
+					m_builder.BeginGeography(OpenGisGeographyType.GeometryCollection);
+					g.Populate(new StripCollection(m_builder));
+				}
 			}
 		}
 
 		public void Write(BinaryWriter w)
 		{
-			w.Write(m_builder == null);
-			if (m_builder != null)
+			w.Write(IsInitialState());
+			if (!IsInitialState())
 			{
-				m_builder.EndGeography();
-				SqlGeography g = m_builder.ConstructedGeography;
-				g.Write(w);
+				ConstructedGeography().Write(w);
 				Init();
 			}
 		}
@@ -180,13 +233,13 @@ namespace SQLSpatialTools
 		{
 			m_sink.EndFigure();
 		}
-		
+
 		public void EndGeography()
 		{
 			m_sink.EndGeography();
 		}
-		
-		public void SetSrid(int srid) {	}
+
+		public void SetSrid(int srid) { }
 	}
 
 	internal class StripCollection : IGeographySink

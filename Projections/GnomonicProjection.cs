@@ -22,7 +22,7 @@ namespace SQLSpatialTools
 		public GnommonicProjection(Dictionary<String, double> parameters)
 			: base(parameters)
 		{
-			_center = Util.SphericalRadToCartesian(InputLatitude("latitude1"), InputLongitude("longitude1"));
+			_center = Util.SphericalRadToCartesian(InputLatitude("latitude1", 90), InputLongitude("longitude1", 360));
 
 			// This projection is designed for numerical computations rather than cartography.
 			// The choice of coordinate basis for the tangent plane - which affects the 
