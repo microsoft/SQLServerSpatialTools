@@ -47,8 +47,18 @@ namespace SQLSpatialTools
 			if (g.IsNull || g.STIsEmpty().Value)
 				return g;
 
-			// force self union of the collection
-			return g.STUnion(g.STPointN(1));
+			try
+			{
+				// Force self union of the collection.
+				return g.STUnion(g.STPointN(1));
+			}
+			catch (ArgumentException)
+			{
+				// Union of an object with its first point could fail is the object
+				// is slightly smaller than a hemisphere. So, do the more expensive,
+				// but correct union here.
+				return g.STUnion(g);
+			}
 		}
 
 		public void Read(BinaryReader r)
@@ -96,7 +106,7 @@ namespace SQLSpatialTools
 		{
 			if (g == null || g.IsNull || m_error) return;
 			Reset(g.STSrid.Value);
-			g.Populate(m_sink);
+			if (m_sink != null) g.Populate(m_sink);
 		}
 
 		private void Reset(int srid)
