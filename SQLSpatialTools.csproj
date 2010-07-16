@@ -49,6 +49,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KMLProcessor\Constants.cs" />
+    <Compile Include="KMLProcessor\Export\ExportContext.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageBase.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageGeography.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageGeometry.cs" />
+    <Compile Include="KMLProcessor\FilterSetSridGeographySink.cs" />
+    <Compile Include="KMLProcessor\GeographyContext.cs" />
+    <Compile Include="KMLProcessor\Import\AltitudeMode.cs" />
+    <Compile Include="KMLProcessor\Import\Geography.cs" />
+    <Compile Include="KMLProcessor\Import\GroundOverlay.cs" />
+    <Compile Include="KMLProcessor\Import\KMLParser.cs" />
+    <Compile Include="KMLProcessor\Import\KMLProcessor.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonAltBox.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonBox.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonBoxBase.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonQuad.cs" />
+    <Compile Include="KMLProcessor\Import\LinearRing.cs" />
+    <Compile Include="KMLProcessor\Import\LineString.cs" />
+    <Compile Include="KMLProcessor\Import\Model.cs" />
+    <Compile Include="KMLProcessor\Import\MultiGeometry.cs" />
+    <Compile Include="KMLProcessor\Import\Placemark.cs" />
+    <Compile Include="KMLProcessor\Import\Point.cs" />
+    <Compile Include="KMLProcessor\Import\Polygon.cs" />
+    <Compile Include="KMLProcessor\Import\Region.cs" />
+    <Compile Include="KMLProcessor\KMLException.cs" />
+    <Compile Include="KMLProcessor\KmlFunctions.cs" />
+    <Compile Include="KMLProcessor\Utilities.cs" />
     <Compile Include="Projections\GnomonicProjection.cs" />
     <Compile Include="Sinks\GeometryToPointGeographySink.cs" />
     <Compile Include="Sinks\VacuousGeographyToGeometrySink.cs" />
