@@ -23,6 +23,9 @@ drop function IsValidGeographyFromText
 drop function MakeValidGeographyFromGeometry
 drop function MakeValidGeographyFromText
 
+drop function FilterArtifactsGeometry
+drop function FilterArtifactsGeography
+
 -- Drop the types...
 drop type Projection
 drop type AffineTransform

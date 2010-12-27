@@ -343,5 +343,83 @@ namespace SQLSpatialTools
 		{
 			return MakeValidGeographyFromGeometry(SqlGeometry.STGeomFromText(new SqlChars(inputWKT), srid));
 		}
+
+		// Selectively filter unwanted artifacts in input object:
+		//	- empty shapes (if [filterEmptyShapes] is true)
+		//	- points (if [filterPoints] is true)
+		//	- linestrings shorter than provided tolerance (if lineString.STLength < [lineStringTolerance])
+		//	- polygon rings thinner than provied tolerance (if ring.STArea < ring.STLength * [ringTolerance])
+		//	- general behaviour: Returned spatial objects will always to the simplest OGC construction
+		//
+		public static SqlGeometry FilterArtifactsGeometry(SqlGeometry g, bool filterEmptyShapes, bool filterPoints, double lineStringTolerance, double ringTolerance)
+		{
+			if (g == null || g.IsNull)
+				return g;
+
+			SqlGeometryBuilder b = new SqlGeometryBuilder();
+			IGeometrySink filter = b;
+
+			if (filterEmptyShapes)
+				filter = new GeometryEmptyShapeFilter(filter);
+			if (ringTolerance > 0)
+			{
+				if (!g.STIsValid().Value)
+					throw new Exception("Input geometry is not valid. Thin ring filter can only be used on valid inputs.");
+				filter = new GeometryThinRingFilter(filter, ringTolerance);
+			}
+			if (lineStringTolerance > 0)
+				filter = new GeometryShortLineStringFilter(filter, lineStringTolerance);
+			if (filterPoints)
+				filter = new GeometryPointFilter(filter);
+
+			g.Populate(filter);
+			g = b.ConstructedGeometry;
+
+			if (g == null || g.IsNull || !g.STIsValid().Value)
+				return g;
+
+			// Strip collections with single element
+			while (g.STNumGeometries().Value == 1 && g.InstanceOf("GEOMETRYCOLLECTION").Value)
+				g = g.STGeometryN(1);
+
+			return g;
+		}
+
+		// Selectively filter unwanted artifacts in input object:
+		//	- empty shapes (if [filterEmptyShapes] is true)
+		//	- points (if [filterPoints] is true)
+		//	- linestrings shorter than provided tolerance (if lineString.STLength < [lineStringTolerance])
+		//	- polygon rings thinner than provied tolerance (if ring.STArea < ring.STLength * [ringTolerance])
+		//	- general behaviour: Returned spatial objects will always to the simplest OGC construction
+		//
+		public static SqlGeography FilterArtifactsGeography(SqlGeography g, bool filterEmptyShapes, bool filterPoints, double lineStringTolerance, double ringTolerance)
+		{
+			if (g == null || g.IsNull)
+				return g;
+
+			SqlGeographyBuilder b = new SqlGeographyBuilder();
+			IGeographySink filter = b;
+
+			if (filterEmptyShapes)
+				filter = new GeographyEmptyShapeFilter(filter);
+			if (ringTolerance > 0)
+				filter = new GeographyThinRingFilter(filter, ringTolerance);
+			if (lineStringTolerance > 0)
+				filter = new GeographyShortLineStringFilter(filter, lineStringTolerance);
+			if (filterPoints)
+				filter = new GeographyPointFilter(filter);
+
+			g.Populate(filter);
+			g = b.ConstructedGeography;
+
+			if (g == null || g.IsNull)
+				return g;
+
+			// Strip collections with single element
+			while (g.STNumGeometries().Value == 1 && g.InstanceOf("GEOMETRYCOLLECTION").Value)
+				g = g.STGeometryN(1);
+
+			return g;
+		}
 	}
 }

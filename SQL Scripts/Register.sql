@@ -73,6 +73,14 @@ create function MakeValidGeographyFromText(@inputWKT nvarchar(max), @srid int) r
 as external name SQLSpatialTools.[SQLSpatialTools.Functions].MakeValidGeographyFromText
 go
 
+create function FilterArtifactsGeometry(@g geometry, @filterEmptyShapes bit, @filterPoints bit, @lineStringTolerance float(53), @ringTolerance float(53)) returns geometry
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].FilterArtifactsGeometry
+go
+
+create function FilterArtifactsGeography(@g geography, @filterEmptyShapes bit, @filterPoints bit, @lineStringTolerance float(53), @ringTolerance float(53)) returns geography
+as external name SQLSpatialTools.[SQLSpatialTools.Functions].FilterArtifactsGeography
+go
+
 -- Create aggregates.
 
 create aggregate GeometryEnvelopeAggregate(@geom geometry) returns geometry
