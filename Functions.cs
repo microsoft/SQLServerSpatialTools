@@ -362,11 +362,7 @@ namespace SQLSpatialTools
 			if (filterEmptyShapes)
 				filter = new GeometryEmptyShapeFilter(filter);
 			if (ringTolerance > 0)
-			{
-				if (!g.STIsValid().Value)
-					throw new Exception("Input geometry is not valid. Thin ring filter can only be used on valid inputs.");
 				filter = new GeometryThinRingFilter(filter, ringTolerance);
-			}
 			if (lineStringTolerance > 0)
 				filter = new GeometryShortLineStringFilter(filter, lineStringTolerance);
 			if (filterPoints)

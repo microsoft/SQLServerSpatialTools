@@ -320,7 +320,7 @@ namespace SQLSpatialTools
 				b.BeginGeometry(OpenGisGeometryType.Polygon);
 				PopulateFigure(b);
 				b.EndGeometry();
-				SqlGeometry poly = b.ConstructedGeometry;
+				SqlGeometry poly = b.ConstructedGeometry.MakeValid();
 				return poly.STArea().Value < m_tolerance * poly.STLength().Value;
 			}
 			catch (ArgumentException) { }
