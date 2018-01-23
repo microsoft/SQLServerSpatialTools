@@ -1,4 +1,4 @@
-﻿***********************************************************
+***********************************************************
 ** 0: Contents
 ***********************************************************
 
@@ -11,17 +11,17 @@
 ***********************************************************
 
 This project is a collection of tools for use with the spatial types
-that are new to SQL Server 2008. This project does not provide an 
+in SQL Server. This project does not provide an 
 end-user application, but rather a set of reusable functions which 
 applications can make use of.
 
-Development of this package is hosted at CodePlex:
-http://www.codeplex.com/sqlspatialtools.  Source is available at
-this site.
+Development of this package is hosted at GitHub:
+http://www.github.com/Microsoft/SQLServerSpatialTools.  
+Source is available at this site.
 
 This package is licensed under the Microsoft public license. See
-http://www.codeplex.com/sqlspatialtools/license or the included
-License.txt file for details.
+http://www.github.com/Microsoft/SQLServerSpatialTools/blob/master/License.txt 
+or the included License.txt file for details.
 
 ***********************************************************
 ** 2: Installation
@@ -29,11 +29,10 @@ License.txt file for details.
 
 This package contains a single assembly, SQLSpatialTools.dll
 This assembly can be included and used directly from a .NET 
-application, or can be registered and used from within SQL Server
-2008.
+application, or can be registered and used from within SQL Server.
 
 Scripts for registering and unregistering the functionality in
-SQL Server 2008 are included in the SQL Scripts directory.
+SQL Server are included in the SQL Scripts directory.
 
 Detailed Steps:
 
@@ -44,13 +43,13 @@ To Register:
      functionality to where indicated at the beginning of the script.
   b) Insert the path to the SQLSpatialTools.dll file where indicated
      at the beginning of the script.
-3) Execute the script on your SQL Server 2008 instance.
+3) Execute the script on your SQL Server instance.
 
 To Unregister:
 1) Edit the Unregister.sql file in the SQL Scripts directory and insert
    the name of the database use are unregistering the functionality
    from where indicated at the beginning of the script.
-2) Execute the script on your SQL Server 2008 instance.
+2) Execute the script on your SQL Server instance.
 
 ***********************************************************
 ** 3: Features
