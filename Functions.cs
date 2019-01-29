@@ -47,9 +47,115 @@ namespace SQLSpatialTools
 			return b.ConstructedGeometry;
 		}
 
-		// Find the point that is the given distance from the start point in the direction of the end point.
-		// The distance must be less than the distance between these two points.
-		public static SqlGeography InterpolateBetweenGeog(SqlGeography start, SqlGeography end, double distance)
+        // Make our LocateMAlongGeometrySink into a function call.  This function just hooks up
+        // and runs a pipeline using the sink.
+        public static SqlGeometry LocateMAlongGeom(SqlGeometry g, double distance)
+        {
+            SqlGeometryBuilder b = new SqlGeometryBuilder();
+            LocateMAlongGeometrySink p = new LocateMAlongGeometrySink(distance, b);
+            g.Populate(p);
+            return b.ConstructedGeometry;
+        }
+
+        // Make our ClipGeometrySegmentSink into a function call.  This function just hooks up
+        // and runs a pipeline using the sink.
+        public static SqlGeometry ClipGeometrySegment(SqlGeometry g, double startMeasure, double endMeasure)
+        {
+            //AppDomain.CurrentDomain.SetData("clr_feature_switch_map", 1);
+            double m1 = g.STPointN(1).M.Value;
+            double m2 = g.STPointN((int)g.STNumPoints()).M.Value;
+            if((startMeasure < m1 && startMeasure < m2) || (startMeasure > m1 && startMeasure > m2))
+            {
+                throw new Exception("Start measure " + startMeasure.ToString() + " is not within the measure range " + Math.Min(m1, m2).ToString() + " : " + Math.Max(m1, m2).ToString() + " of the linear geometry.");
+            }
+            if ((endMeasure < m1 && endMeasure < m2) || (endMeasure > m1 && endMeasure > m2))
+            {
+                throw new Exception("End measure " + endMeasure.ToString() + " is not within the measure range " + Math.Min(m1, m2).ToString() + " : " + Math.Max(m1, m2).ToString() + " of the linear geometry.");
+            }
+            //SqlGeometry startPoint = LocateMAlongGeom(g, startMeasure);
+            //SqlGeometry endPoint = LocateMAlongGeom(g, endMeasure);
+            SqlGeometryBuilder b = new SqlGeometryBuilder();
+            //ClipGeometrySegmentSink p = new ClipGeometrySegmentSink(startPoint, endPoint, b);
+            ClipGeometrySegmentSink2 p = new ClipGeometrySegmentSink2(startMeasure, endMeasure, b);
+            g.Populate(p);
+            return b.ConstructedGeometry;
+        }
+
+        // Make our SplitGeometrySegmentSink into a function call.  This function just hooks up
+        // and runs a pipeline using the sink.
+        public static void SplitGeometrySegment(SqlGeometry g, double splitMeasure, out SqlGeometry g1, out SqlGeometry g2)
+        {
+            SqlGeometry splitPoint = LocateMAlongGeom(g, splitMeasure);
+            SqlGeometryBuilder b1 = new SqlGeometryBuilder();
+            SqlGeometryBuilder b2 = new SqlGeometryBuilder();
+            SplitGeometrySegmentSink p = new SplitGeometrySegmentSink(splitPoint, b1, b2);
+            g.Populate(p);
+            g1 = b1.ConstructedGeometry;
+            g2 = b2.ConstructedGeometry;
+        }
+
+        // Make our MergeGeometrySegmentsSink into a function call.  This function just hooks up
+        // and runs a pipeline using the sink.
+        public static SqlGeometry MergeGeometrySegments(SqlGeometry g1, SqlGeometry g2)
+        {
+            double? mOffset;
+            mOffset = (double?)(g1.STPointN((int)g1.STNumPoints()).M - g2.STPointN(1).M);
+            SqlGeometryBuilder b = new SqlGeometryBuilder();
+            MergeGeometrySegmentSink p = new MergeGeometrySegmentSink(b, true, false, null);
+            g1.Populate(p);
+            p = new MergeGeometrySegmentSink(b, false, true, mOffset);
+            g2.Populate(p);
+            return b.ConstructedGeometry;
+        }
+
+        //(Re)populate measures across shape points
+        public static SqlGeometry PopulateGeometryMeasures(SqlGeometry g, double? startMeasure, double? endMeasure)
+        {
+            double _startMeasure;
+            double _endMeasure;
+            double length;
+
+            if (startMeasure == null)
+            {
+                _startMeasure = ((g.STPointN(1).M.IsNull) ? 0 : g.STPointN(1).M.Value);
+            }
+            else
+            {
+                _startMeasure = (double)startMeasure;
+            }
+
+            if (endMeasure == null)
+            {
+                _endMeasure = ((g.STPointN((int)g.STNumPoints()).M.IsNull) ? g.STLength().Value : g.STPointN((int)g.STNumPoints()).M.Value);
+            }
+            else
+            {
+                _endMeasure = (double)endMeasure;
+            }
+
+            length = g.STLength().Value;
+
+            SqlGeometryBuilder b = new SqlGeometryBuilder();
+            PopulateGeometryMeasuresSink p = new PopulateGeometryMeasuresSink(_startMeasure, _endMeasure, length, b);
+            g.Populate(p);
+            return b.ConstructedGeometry;
+        }
+
+        public static SqlGeometry ReverseLinearGeometry(SqlGeometry g)
+        {
+            if (g.STGeometryType() == "LINESTRING")
+            {
+                return ReverseLinestring(g);
+            }
+            else
+            {
+                throw new Exception("LINESTRING is currently the only spatial type supported");
+            }
+        }
+
+        // Find the point that is the given distance from the start point in the direction of the end point.
+        // The distance must be less than the distance between these two points.
+        public static SqlGeography InterpolateBetweenGeog(SqlGeography start, SqlGeography end, double distance)
 		{
 			// We need to check a few prequisites.
 
@@ -151,13 +257,55 @@ namespace SQLSpatialTools
 			double newY = (start.STY.Value * (1-f)) + (end.STY.Value * f);
 			return SqlGeometry.Point(newX, newY, srid);
 		}
-		
-		// This function is used for generating a new geography object where additional points are inserted
-		// along every line in such a way that the angle between two consecutive points does not
-		// exceed a prescribed angle. The points are generated between the unit vectors that correspond
-		// to the line's start and end along the great-circle arc on the unit sphere. This follows the
-		// definition of geodetic lines in SQL Server.
-		public static SqlGeography DensifyGeography(SqlGeography g, double maxAngle)
+
+        // Find the point with specified measure, going from the start point in the direction of the end point.
+        // The measure must be between measures of these two points.
+        public static SqlGeometry InterpolateMBetweenGeom(SqlGeometry start, SqlGeometry end, double measure)
+        {
+            // We need to check a few prequisites.
+
+            // We only operate on points.
+
+            if (start.STGeometryType().Value != "Point")
+            {
+                throw new ArgumentException("Start value must be a point.");
+            }
+
+            if (end.STGeometryType().Value != "Point")
+            {
+                throw new ArgumentException("Start value must be a point.");
+            }
+
+            // The SRIDs also have to match
+            int srid = start.STSrid.Value;
+            if (srid != end.STSrid.Value)
+            {
+                throw new ArgumentException("The start and end SRIDs must match.");
+            }
+
+            // Finally, the distance has to fall between these points.
+            //double length = start.STDistance(end).Value;
+            //double mLength = end.M.Value - start.M.Value;
+            if ((measure < start.M.Value && measure < end.M.Value) || (measure > start.M.Value && measure > end.M.Value))
+            {
+                throw new ArgumentException("The measure value provided doesn't fall between the two points.");
+            }
+
+            // Since we're working on a Cartesian plane, this is now pretty simple.
+            double f = (measure - start.M.Value) / (end.M.Value - start.M.Value);  // The fraction of the way from start to end.
+            double newX = (start.STX.Value * (1 - f)) + (end.STX.Value * f);
+            double newY = (start.STY.Value * (1 - f)) + (end.STY.Value * f);
+            //There's no way to know Z, so just put NULL there
+            return SqlGeometry.STPointFromText(new SqlChars("POINT(" + newX.ToString() + " " + newY.ToString() + " NULL " + measure.ToString() + ")"), srid);
+            
+        }
+
+        // This function is used for generating a new geography object where additional points are inserted
+        // along every line in such a way that the angle between two consecutive points does not
+        // exceed a prescribed angle. The points are generated between the unit vectors that correspond
+        // to the line's start and end along the great-circle arc on the unit sphere. This follows the
+        // definition of geodetic lines in SQL Server.
+        public static SqlGeography DensifyGeography(SqlGeography g, double maxAngle)
 		{
 			SqlGeographyBuilder b = new SqlGeographyBuilder();
 			g.Populate(new DensifyGeographySink(b, maxAngle));
@@ -357,7 +505,7 @@ namespace SQLSpatialTools
 				return g;
 
 			SqlGeometryBuilder b = new SqlGeometryBuilder();
-			IGeometrySink filter = b;
+			IGeometrySink110 filter = b;
 
 			if (filterEmptyShapes)
 				filter = new GeometryEmptyShapeFilter(filter);
@@ -394,7 +542,7 @@ namespace SQLSpatialTools
 				return g;
 
 			SqlGeographyBuilder b = new SqlGeographyBuilder();
-			IGeographySink filter = b;
+			IGeographySink110 filter = b;
 
 			if (filterEmptyShapes)
 				filter = new GeographyEmptyShapeFilter(filter);
@@ -417,5 +565,31 @@ namespace SQLSpatialTools
 
 			return g;
 		}
-	}
+
+        public static SqlGeometry GeomFromXYMText(string wktXYM, int srid)
+        {
+            ConvertXVZ2XYM res = new ConvertXVZ2XYM();
+
+            SqlGeometry.STGeomFromText(new SqlChars(wktXYM), srid)
+                       .Populate(res);
+
+            return res.ConstructedGeometry;
+        }
+
+        private static SqlGeometry ReverseLinestring(SqlGeometry g)
+        {
+            SqlGeometryBuilder b = new SqlGeometryBuilder();
+            b.SetSrid((int)g.STSrid);
+            b.BeginGeometry(OpenGisGeometryType.LineString);
+            b.BeginFigure(g.STEndPoint().STX.Value, g.STEndPoint().STY.Value, g.STEndPoint().Z.Value, g.STEndPoint().M.Value);
+            for (int i = (int)g.STNumPoints()-1; i>= 1; i--)
+            {
+                b.AddLine(g.STPointN(i).STX.Value, g.STPointN(i).STY.Value, g.STPointN(i).Z.Value, g.STPointN(i).M.Value);
+            }
+            b.EndFigure();
+            b.EndGeometry();
+            return b.ConstructedGeometry;
+        }
+
+    }
 }

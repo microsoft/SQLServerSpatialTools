@@ -22,20 +22,20 @@ namespace SQLSpatialTools
 			m = m_;
 		}
 
-		public void BeginFigure(IGeometrySink sink) { sink.BeginFigure(x, y, z, m); }
-		public void AddLine(IGeometrySink sink) { sink.AddLine(x, y, z, m); }
+		public void BeginFigure(IGeometrySink110 sink) { sink.BeginFigure(x, y, z, m); }
+		public void AddLine(IGeometrySink110 sink) { sink.AddLine(x, y, z, m); }
 
-		public void BeginFigure(IGeographySink sink) { sink.BeginFigure(x, y, z, m); }
-		public void AddLine(IGeographySink sink) { sink.AddLine(x, y, z, m); }
+		public void BeginFigure(IGeographySink110 sink) { sink.BeginFigure(x, y, z, m); }
+		public void AddLine(IGeographySink110 sink) { sink.AddLine(x, y, z, m); }
 	}
 
-	public class GeometryEmptyShapeFilter : IGeometrySink
+	public class GeometryEmptyShapeFilter : IGeometrySink110
 	{
-		private IGeometrySink m_sink;
+		private IGeometrySink110 m_sink;
 		private Queue<OpenGisGeometryType> m_types = new Queue<OpenGisGeometryType>();
 		private bool m_root = true;
 
-		public GeometryEmptyShapeFilter(IGeometrySink sink)
+		public GeometryEmptyShapeFilter(IGeometrySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -78,19 +78,24 @@ namespace SQLSpatialTools
 			m_sink.AddLine(latitude, longitude, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			m_sink.EndFigure();
 		}
 	}
 
-	public class GeometryPointFilter : IGeometrySink
+	public class GeometryPointFilter : IGeometrySink110
 	{
-		private IGeometrySink m_sink;
+		private IGeometrySink110 m_sink;
 		private int m_depth;
 		private bool m_root = true;
 
-		public GeometryPointFilter(IGeometrySink sink)
+		public GeometryPointFilter(IGeometrySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -137,22 +142,27 @@ namespace SQLSpatialTools
 			m_sink.AddLine(x, y, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_depth == 0)
 				m_sink.EndFigure();
 		}
 	}
 
-	public class GeometryShortLineStringFilter : IGeometrySink
+	public class GeometryShortLineStringFilter : IGeometrySink110
 	{
-		private IGeometrySink m_sink;
+		private IGeometrySink110 m_sink;
 		private double m_tolerance;
 		private int m_srid;
 		private bool m_insideLineString;
 		private List<Vertex> m_figure = new List<Vertex>();
 
-		public GeometryShortLineStringFilter(IGeometrySink sink, double tolerance)
+		public GeometryShortLineStringFilter(IGeometrySink110 sink, double tolerance)
 		{
 			m_sink = sink;
 			m_tolerance = tolerance;
@@ -200,7 +210,12 @@ namespace SQLSpatialTools
 			}
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_insideLineString)
 			{
@@ -231,7 +246,7 @@ namespace SQLSpatialTools
 			return true;
 		}
 
-		private void PopulateFigure(IGeometrySink sink)
+		private void PopulateFigure(IGeometrySink110 sink)
 		{
 			m_figure[0].BeginFigure(sink);
 			for (int i = 1; i < m_figure.Count; i++)
@@ -240,15 +255,15 @@ namespace SQLSpatialTools
 		}
 	}
 
-	public class GeometryThinRingFilter : IGeometrySink
+	public class GeometryThinRingFilter : IGeometrySink110
 	{
-		private IGeometrySink m_sink;
+		private IGeometrySink110 m_sink;
 		private double m_tolerance;
 		private bool m_insidePolygon;
 		private int m_srid;
 		private List<Vertex> m_figure = new List<Vertex>();
 
-		public GeometryThinRingFilter(IGeometrySink sink, double tolerance)
+		public GeometryThinRingFilter(IGeometrySink110 sink, double tolerance)
 		{
 			m_sink = sink;
 			m_tolerance = tolerance;
@@ -296,7 +311,12 @@ namespace SQLSpatialTools
 			}
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_insidePolygon)
 			{
@@ -328,7 +348,7 @@ namespace SQLSpatialTools
 			return true;
 		}
 
-		private void PopulateFigure(IGeometrySink sink)
+		private void PopulateFigure(IGeometrySink110 sink)
 		{
 			m_figure[0].BeginFigure(sink);
 			for (int i = 1; i < m_figure.Count; i++)

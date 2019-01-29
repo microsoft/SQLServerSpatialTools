@@ -6,12 +6,12 @@ using Microsoft.SqlServer.Types;
 
 namespace SQLSpatialTools
 {
-	public sealed class GeometryTransformer : IGeometrySink
+	public sealed class GeometryTransformer : IGeometrySink110
 	{
-		readonly IGeometrySink _sink;
+		readonly IGeometrySink110 _sink;
 		readonly AffineTransform _transform;
 
-		public GeometryTransformer(IGeometrySink sink, AffineTransform transform)
+		public GeometryTransformer(IGeometrySink110 sink, AffineTransform transform)
 		{
 			_sink = sink;
 			_transform = transform;
@@ -37,7 +37,12 @@ namespace SQLSpatialTools
 			_sink.AddLine(_transform.GetX(x, y), _transform.GetY(x, y), z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new System.Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			_sink.EndFigure();
 		}

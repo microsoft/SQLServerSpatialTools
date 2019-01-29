@@ -1,0 +1,6 @@
+bin/
+obj/
+*.zip
+.vs/
+*.psess
+*.vspx

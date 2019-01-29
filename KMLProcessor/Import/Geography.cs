@@ -111,7 +111,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// This method populates the given sink with the data from this geography instance
 		/// </summary>
 		/// <param name="sink">Sink to be populated</param>
-		public abstract void Populate(IGeographySink sink);
+		public abstract void Populate(IGeographySink110 sink);
 
 		/// <summary>
 		/// SqlGeography instance well-known text.
@@ -169,7 +169,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// <param name="makeValid">If true and this geography instance is invalid then the MakeValid
 		/// function will be executed on this geography instance</param>
 		public void Populate(
-			IGeographySink sink,
+			IGeographySink110 sink,
 			bool makeValid)
 		{
 			if (makeValid)
@@ -189,7 +189,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// This method populates the given sink with the valid geography instance constructed from this geography instance.
 		/// </summary>
 		/// <param name="sink">Sink to be populated</param>
-		public void MakeValid(IGeographySink sink)
+		public void MakeValid(IGeographySink110 sink)
 		{
 			// 1. Creates the valid geography for this WKT
 			SqlGeography vg = SQLSpatialTools.Functions.MakeValidGeographyFromText(this.WKT, Constants.DefaultSRID);

@@ -6,12 +6,12 @@ using Microsoft.SqlServer.Types;
 
 namespace SQLSpatialTools
 {
-	public sealed class Projector : IGeographySink
+	public sealed class Projector : IGeographySink110
 	{
 		private readonly SqlProjection _projection;
-		private readonly IGeometrySink _sink;
+		private readonly IGeometrySink110 _sink;
 
-		public Projector(SqlProjection projection, IGeometrySink sink)
+		public Projector(SqlProjection projection, IGeometrySink110 sink)
 		{
 			_projection = projection;
 			_sink = sink;
@@ -41,7 +41,12 @@ namespace SQLSpatialTools
 			_sink.AddLine(x, y, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			_sink.EndFigure();
 		}

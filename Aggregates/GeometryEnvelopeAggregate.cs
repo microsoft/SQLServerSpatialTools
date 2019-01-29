@@ -17,7 +17,7 @@ namespace SQLSpatialTools
 		IsInvariantToNulls = true,
 		IsInvariantToOrder = true,
 		IsNullIfEmpty = true)]
-	public class GeometryEnvelopeAggregate : IGeometrySink
+	public class GeometryEnvelopeAggregate : IGeometrySink110
 	{
 		private double minX, maxX, minY, maxY;
 		private int lastSrid;
@@ -41,7 +41,12 @@ namespace SQLSpatialTools
 			IncludePoint(x, y);
 		}
 
-		public void EndFigure() { }
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure() { }
 
 		public void EndGeometry() {	}
 

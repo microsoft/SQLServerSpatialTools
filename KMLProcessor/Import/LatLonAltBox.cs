@@ -76,7 +76,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// This method populates the given sink with the data from this geography instance
 		/// </summary>
 		/// <param name="sink">Sink to be populated</param>
-		public override void Populate(Microsoft.SqlServer.Types.IGeographySink sink)
+		public override void Populate(Microsoft.SqlServer.Types.IGeographySink110 sink)
 		{
 			// Initializes the altitude to the maximal value
 			m_Altitude = MaxAltitude;

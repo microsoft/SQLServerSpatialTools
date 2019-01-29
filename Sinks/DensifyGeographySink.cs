@@ -12,7 +12,7 @@ namespace SQLSpatialTools
     /// to the line's start and end along the great-circle arc on the unit sphere .  This follows the
     /// definition of geodetic lines in SQL Server.
     /// </summary>
-    public class DensifyGeographySink : IGeographySink
+    public class DensifyGeographySink : IGeographySink110
     {
         // Minimum angle. If the user specifies a smaller angle, the angle will be set to this minimum.
         public static readonly double MinAngle = 0.000001;
@@ -23,10 +23,10 @@ namespace SQLSpatialTools
         // Previous point added.
         private Vector3 _startPoint;
 
-        private readonly IGeographySink _sink;
+        private readonly IGeographySink110 _sink;
 
         // Constructor.
-		public DensifyGeographySink(IGeographySink sink, double angle)
+		public DensifyGeographySink(IGeographySink110 sink, double angle)
         {
             if (sink == null)
                 throw new ArgumentNullException("sink");
@@ -88,6 +88,11 @@ namespace SQLSpatialTools
 
             // Remembering last point we added.
             _startPoint = endPoint;
+        }
+
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
         }
 
         public void BeginFigure(double latitude, double longitude, double? z, double? m)

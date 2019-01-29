@@ -9,7 +9,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 	/// This class is the geography sink. It will export the given geography instances
 	/// into the KML format.
 	/// </summary>
-	internal class KeyholeMarkupLanguageGeography : KeyholeMarkupLanguageBase, IGeographySink
+	internal class KeyholeMarkupLanguageGeography : KeyholeMarkupLanguageBase, IGeographySink110
 	{
 		#region Constructors
 
@@ -25,7 +25,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 
 		#endregion
 
-		#region IGeographySink interface
+		#region IGeographySink110 interface
 
 		/// <summary>
 		/// This method will be called when a new geography instance should be passed to the sink
@@ -225,14 +225,19 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 			}
 		}
 
-		#endregion
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
 
-		#region Private Data
+        #endregion
 
-		/// <summary>
-		/// Export execution context
-		/// </summary>
-		private ExportContext<OpenGisGeographyType> m_Context = new ExportContext<OpenGisGeographyType>();
+        #region Private Data
+
+        /// <summary>
+        /// Export execution context
+        /// </summary>
+        private ExportContext<OpenGisGeographyType> m_Context = new ExportContext<OpenGisGeographyType>();
 
 		#endregion
 	}

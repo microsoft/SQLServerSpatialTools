@@ -44,13 +44,14 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SqlServer.Types, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -99,9 +100,14 @@
     <Compile Include="KMLProcessor\KmlFunctions.cs" />
     <Compile Include="KMLProcessor\Utilities.cs" />
     <Compile Include="Projections\GnomonicProjection.cs" />
+    <Compile Include="Sinks\ClipGeometrySegmentSink.cs" />
     <Compile Include="Sinks\GeographyFilters.cs" />
     <Compile Include="Sinks\GeometryFilters.cs" />
     <Compile Include="Sinks\GeometryToPointGeographySink.cs" />
+    <Compile Include="Sinks\LocateMAlongGeomSink.cs" />
+    <Compile Include="Sinks\MergeGeometrySegmentSink.cs" />
+    <Compile Include="Sinks\PopulateGeometryMeasuresSink.cs" />
+    <Compile Include="Sinks\SplitGeometrySegmentSink.cs" />
     <Compile Include="Sinks\VacuousGeographyToGeometrySink.cs" />
     <Compile Include="Sinks\VacuousGeometryToGeographySink.cs" />
     <Compile Include="Types\AffineTransform.cs" />
@@ -126,6 +132,7 @@
     <Compile Include="Sinks\Projector.cs" />
     <Compile Include="Sinks\ShiftGeometrySink.cs" />
     <Compile Include="Sinks\Unprojector.cs" />
+    <Compile Include="Utility\ConvertXVZ2XYM.cs" />
     <Compile Include="Utility\Util.cs" />
     <Compile Include="Utility\Vector3.cs" />
   </ItemGroup>

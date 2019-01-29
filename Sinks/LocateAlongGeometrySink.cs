@@ -9,7 +9,7 @@ namespace SQLSpatialTools
      * This class implements a geometry sink that finds a point along a geography linestring instance and pipes
      * it to another sink.
      */
-    class LocateAlongGeometrySink : IGeometrySink
+    class LocateAlongGeometrySink : IGeometrySink110
     {
     
         double _distance;              // The running count of how much further we have to go.
@@ -73,6 +73,11 @@ namespace SQLSpatialTools
             }
         }
 
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
         // This is a NOP.
         public void EndFigure()
         {
@@ -94,7 +99,7 @@ namespace SQLSpatialTools
             }
             else
             {
-                throw new ArgumentException("Distance provided is greated then the length of the LineString.");
+                throw new ArgumentException("Distance provided is greater than the length of the LineString.");
             }
         }
 

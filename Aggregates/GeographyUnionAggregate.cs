@@ -85,7 +85,7 @@ namespace SQLSpatialTools
 	public class GeographyCollectionAggregate : IBinarySerialize
 	{
 		private SqlGeographyBuilder m_builder;
-		private IGeographySink m_sink;
+		private IGeographySink110 m_sink;
 		private int m_srid;
 		private bool m_error;
 
@@ -215,11 +215,11 @@ namespace SQLSpatialTools
 		}
 	}
 
-	internal class StripSRID : IGeographySink
+	internal class StripSRID : IGeographySink110
 	{
-		private readonly IGeographySink m_sink;
+		private readonly IGeographySink110 m_sink;
 
-		public StripSRID(IGeographySink sink)
+		public StripSRID(IGeographySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -239,7 +239,12 @@ namespace SQLSpatialTools
 			m_sink.AddLine(latitude, longitude, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			m_sink.EndFigure();
 		}
@@ -252,12 +257,12 @@ namespace SQLSpatialTools
 		public void SetSrid(int srid) { }
 	}
 
-	internal class StripCollection : IGeographySink
+	internal class StripCollection : IGeographySink110
 	{
-		private readonly IGeographySink m_sink;
+		private readonly IGeographySink110 m_sink;
 		private int m_depth;
 
-		public StripCollection(IGeographySink sink)
+		public StripCollection(IGeographySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -285,7 +290,12 @@ namespace SQLSpatialTools
 			m_sink.AddLine(latitude, longitude, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			m_sink.EndFigure();
 		}

@@ -60,7 +60,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// This method populates the given sink with the information about this multy geometry instance
 		/// </summary>
 		/// <param name="sink">Sink to be populated</param>
-		public override void Populate(Microsoft.SqlServer.Types.IGeographySink sink)
+		public override void Populate(Microsoft.SqlServer.Types.IGeographySink110 sink)
 		{
 			sink.BeginGeography(OpenGisGeographyType.GeometryCollection);
 

@@ -9,7 +9,7 @@ namespace SQLSpatialTools
      * This class implements a geography sink that finds a point along a geography linestring instance and pipes
      * it to another sink.
      */
-    class LocateAlongGeographySink : IGeographySink
+    class LocateAlongGeographySink : IGeographySink110
     {
     
         double _distance;               // The running count of how much further we have to go.
@@ -71,6 +71,11 @@ namespace SQLSpatialTools
                 // now we need to do the hard work and find the point in between these two
                 _foundPoint = Functions.InterpolateBetweenGeog(_lastPoint, thisPoint, _distance);
             }
+        }
+
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
         }
 
         // This is a NOP.

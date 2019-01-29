@@ -13,12 +13,12 @@ namespace SQLSpatialTools
 	 * point (x, y) --> (long, lat).  The class takes a target geography sink, as well as the target SRID to
 	 * assign to the results.
 	 */
-	public class VacuousGeometryToGeographySink : IGeometrySink
+	public class VacuousGeometryToGeographySink : IGeometrySink110
 	{
-		private readonly IGeographySink _target;
+		private readonly IGeographySink110 _target;
 		private readonly int _targetSrid;
 
-		public VacuousGeometryToGeographySink(int targetSrid, IGeographySink target)
+		public VacuousGeometryToGeographySink(int targetSrid, IGeographySink110 target)
 		{
 			_target = target;
 			_targetSrid = targetSrid;
@@ -29,7 +29,12 @@ namespace SQLSpatialTools
 			_target.AddLine(y, x, z, m);
 		}
 
-		public void BeginFigure(double x, double y, double? z, double? m)
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void BeginFigure(double x, double y, double? z, double? m)
 		{
 			_target.BeginFigure(y, x, z, m);
 		}

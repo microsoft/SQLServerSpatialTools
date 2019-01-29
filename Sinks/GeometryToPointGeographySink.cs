@@ -9,12 +9,12 @@ namespace SQLSpatialTools
 	//
 	// Sink which extracts points from a geometry instance and forwards them to a geography sink
 	//
-	public sealed class GeometryToPointGeographySink : IGeometrySink
+	public sealed class GeometryToPointGeographySink : IGeometrySink110
 	{
-		private readonly IGeographySink _sink;
+		private readonly IGeographySink110 _sink;
 		private int _count;
 
-		public GeometryToPointGeographySink(IGeographySink sink)
+		public GeometryToPointGeographySink(IGeographySink110 sink)
 		{
 			_sink = sink;
 			_count = 0;
@@ -51,7 +51,12 @@ namespace SQLSpatialTools
 			BeginFigure(x, y, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			// we ignore these calls
 		}

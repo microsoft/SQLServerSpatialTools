@@ -73,7 +73,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// This method populates the given sink with the data from this geography instance
 		/// </summary>
 		/// <param name="sink">Sink to be populated</param>
-		public override void Populate(IGeographySink sink)
+		public override void Populate(IGeographySink110 sink)
 		{
 			if (this.OuterRing == null || this.OuterRing.Points == null || this.OuterRing.Points.Count == 0)
 				return;

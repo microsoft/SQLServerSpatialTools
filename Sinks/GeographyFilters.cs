@@ -7,13 +7,13 @@ using Microsoft.SqlServer.Types;
 
 namespace SQLSpatialTools
 {
-	public class GeographyEmptyShapeFilter : IGeographySink
+	public class GeographyEmptyShapeFilter : IGeographySink110
 	{
-		private IGeographySink m_sink;
+		private IGeographySink110 m_sink;
 		private Queue<OpenGisGeographyType> m_types = new Queue<OpenGisGeographyType>();
 		private bool m_root = true;
 
-		public GeographyEmptyShapeFilter(IGeographySink sink)
+		public GeographyEmptyShapeFilter(IGeographySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -56,19 +56,24 @@ namespace SQLSpatialTools
 			m_sink.AddLine(latitude, longitude, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			m_sink.EndFigure();
 		}
 	}
 
-	public class GeographyPointFilter : IGeographySink
+	public class GeographyPointFilter : IGeographySink110
 	{
-		private IGeographySink m_sink;
+		private IGeographySink110 m_sink;
 		private int m_depth;
 		private bool m_root = true;
 
-		public GeographyPointFilter(IGeographySink sink)
+		public GeographyPointFilter(IGeographySink110 sink)
 		{
 			m_sink = sink;
 		}
@@ -117,22 +122,27 @@ namespace SQLSpatialTools
 				m_sink.AddLine(latitude, longitude, z, m);
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_depth == 0)
 				m_sink.EndFigure();
 		}
 	}
 
-	public class GeographyShortLineStringFilter : IGeographySink
+	public class GeographyShortLineStringFilter : IGeographySink110
 	{
-		private IGeographySink m_sink;
+		private IGeographySink110 m_sink;
 		private double m_tolerance;
 		private int m_srid;
 		private bool m_insideLineString;
 		private List<Vertex> m_figure = new List<Vertex>();
 
-		public GeographyShortLineStringFilter(IGeographySink sink, double tolerance)
+		public GeographyShortLineStringFilter(IGeographySink110 sink, double tolerance)
 		{
 			m_sink = sink;
 			m_tolerance = tolerance;
@@ -180,7 +190,12 @@ namespace SQLSpatialTools
 			}
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_insideLineString)
 			{
@@ -212,7 +227,7 @@ namespace SQLSpatialTools
 			return false;
 		}
 
-		private void PopulateFigure(IGeographySink sink)
+		private void PopulateFigure(IGeographySink110 sink)
 		{
 			m_figure[0].BeginFigure(sink);
 			for (int i = 1; i < m_figure.Count; i++)
@@ -221,15 +236,15 @@ namespace SQLSpatialTools
 		}
 	}
 
-	public class GeographyThinRingFilter : IGeographySink
+	public class GeographyThinRingFilter : IGeographySink110
 	{
-		private IGeographySink m_sink;
+		private IGeographySink110 m_sink;
 		private double m_tolerance;
 		private bool m_insidePolygon;
 		private int m_srid;
 		private List<Vertex> m_figure = new List<Vertex>();
 
-		public GeographyThinRingFilter(IGeographySink sink, double tolerance)
+		public GeographyThinRingFilter(IGeographySink110 sink, double tolerance)
 		{
 			m_sink = sink;
 			m_tolerance = tolerance;
@@ -277,7 +292,12 @@ namespace SQLSpatialTools
 			}
 		}
 
-		public void EndFigure()
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new Exception("AddCircularArc is not implemented yet in this class");
+        }
+
+        public void EndFigure()
 		{
 			if (m_insidePolygon)
 			{
@@ -325,7 +345,7 @@ namespace SQLSpatialTools
 			return null;
 		}
 
-		private void PopulateFigure(IGeographySink sink, bool reverse)
+		private void PopulateFigure(IGeographySink110 sink, bool reverse)
 		{
 			if (reverse)
 			{

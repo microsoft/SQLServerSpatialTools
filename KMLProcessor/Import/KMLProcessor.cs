@@ -115,7 +115,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
         /// <param name="makeValid">If true and the extracted geography instance is invalid then the MakeValid
         /// function will be executed on the extracted geography instance</param>
 		public void Populate(
-			IGeographySink sink,
+			IGeographySink110 sink,
 			bool makeValid)
 		{
 			sink.SetSrid(m_Srid);
