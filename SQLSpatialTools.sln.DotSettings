@@ -1,0 +1,46 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=ABBC/@EntryIndexedValue">ABBC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=AC/@EntryIndexedValue">AC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=BC/@EntryIndexedValue">BC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=BCAC/@EntryIndexedValue">BCAC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=DB/@EntryIndexedValue">DB</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GIS/@EntryIndexedValue">GIS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=KML/@EntryIndexedValue">KML</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=LRS/@EntryIndexedValue">LRS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=LSLS/@EntryIndexedValue">LSLS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=LSMLS/@EntryIndexedValue">LSMLS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MLSLS/@EntryIndexedValue">MLSLS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MLSMLS/@EntryIndexedValue">MLSMLS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MSSQL/@EntryIndexedValue">MSSQL</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=OGC/@EntryIndexedValue">OGC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=OSS/@EntryIndexedValue">OSS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SQL/@EntryIndexedValue">SQL</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SRID/@EntryIndexedValue">SRID</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=ST/@EntryIndexedValue">ST</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=WKT/@EntryIndexedValue">WKT</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XY/@EntryIndexedValue">XY</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XYM/@EntryIndexedValue">XYM</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XYZ/@EntryIndexedValue">XYZ</s:String>
+	<s:String x:Key="/Default/FilterSettingsManager/CoverageFilterXml/@EntryValue">&lt;data&gt;&lt;IncludeFilters /&gt;&lt;ExcludeFilters&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Types.LRSLine" FunctionMask="System.Collections.IEnumerable.GetEnumerator" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Types.LRSMultiLine" FunctionMask="System.Collections.IEnumerable.GetEnumerator" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.LocateMAlongGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.PopulateGeometryMeasuresSink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.SplitGeometrySegmentSink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ReverseAndTranslateGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.GeometryPointFilter" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ReverseLinearGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.GeometryToPointGeographySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ScaleMeasureGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.BuildLRSMultiLineSink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.TranslateMeasureGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ClipMGeometrySegmentSink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.LineStringMergeGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ShiftGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.VacuousGeometryToGeographySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.UnProjector" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ResetMGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.BuildMultiLineFromLinesSink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.ValidateLinearMeasureGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;Filter ModuleMask="SQLSpatialTools" ModuleVersionMask="*" ClassMask="SQLSpatialTools.Sinks.Geometry.LocateAlongGeometrySink" FunctionMask="AddCircularArc" IsEnabled="True" /&gt;&lt;/ExcludeFilters&gt;&lt;/data&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Albers/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=BCAC/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=CIRCULARSTRING/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=CURVEPOLYGON/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=densified/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Densify/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=EPSG/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Equirectangular/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=gnomonic/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=lookat/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=LSLS/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=LSMLS/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=MLSLS/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=MLSMLS/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Placemark/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Placemarks/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=sinh/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=unproject/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=unprojected/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unprojects/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unregister/@EntryIndexedValue">True</s:Boolean>
+</wpf:ResourceDictionary>
