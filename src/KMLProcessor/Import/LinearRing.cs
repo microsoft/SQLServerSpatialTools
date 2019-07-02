@@ -1,63 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
+
 using Microsoft.SqlServer.Types;
-using System.Data.SqlTypes;
 
-namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
+namespace SQLSpatialTools.KMLProcessor.Import
 {
-	/// <summary>
-	/// This class contains the data about a linear ring extracted from the KML file
-	/// </summary>
-	public class LinearRing : LineString
-	{
-		#region Constructors
+    /// <summary>
+    /// This class contains the data about a linear ring extracted from the KML file
+    /// </summary>
+    public class LinearRing : LineString
+    {
+        #region Constructors
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		public LinearRing()
-		{
-			m_OpenGisGeographyType = OpenGisGeographyType.Polygon;
-		}
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public LinearRing()
+        {
+            GeographyType = OpenGisGeographyType.Polygon;
+        }
 
-		#endregion
+        #endregion
 
-		#region Public Mehods
+        #region Public Methods
 
-		/// <summary>
-		/// This method switchs the ring's orientation
-		/// </summary>
-		public void SwitchOrientation()
-		{
-			int i = 1;
-			int j = Points.Count - 2; // index of the element before last
-			while (i < j)
-			{
-				Point tmp = m_Points[i];
-				m_Points[i] = m_Points[j];
-				m_Points[j] = tmp;
+        /// <summary>
+        /// This method switches the ring's orientation
+        /// </summary>
+        public void SwitchOrientation()
+        {
+            var i = 1;
+            var j = Points.Count - 2; // index of the element before last
+            while (i < j)
+            {
+                var tmp = Points[i];
+                Points[i] = Points[j];
+                Points[j] = tmp;
 
-				i++;
-				j--;
-			}
-		}
+                i++;
+                j--;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Public Properties
+        #region Public Properties
 
-		/// <summary>
-		/// SqlGeography instance well-known text.
-		/// </summary>
-		public override string WKT
-		{
-			get
-			{
-				return "POLYGON(" + Vertices + ")";
-			}
-		}
+        /// <summary>
+        /// SqlGeography instance well-known text.
+        /// </summary>
+        public override string WKT => "POLYGON(" + Vertices + ")";
 
-		#endregion
-	}
+        #endregion
+    }
 }

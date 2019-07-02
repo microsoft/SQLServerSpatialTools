@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
 
-namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
+namespace SQLSpatialTools.KMLProcessor.Import
 {
-	/// <summary>
-	/// Altitude modes allowed in KML
-	/// </summary>
-	public enum AltitudeMode
-	{
-		clampToGround = 0,
-		relativeToGround = 1,
-		absolute = 2,
-		clampToSeaFloor = 3,
-		relativeToSeaFloor = 4
-	}
+    /// <summary>
+    /// Altitude modes allowed in KML
+    /// </summary>
+    public enum AltitudeMode
+    {
+        ClampToGround = 0,
+        RelativeToGround = 1,
+        Absolute = 2,
+        ClampToSeaFloor = 3,
+        RelativeToSeaFloor = 4
+    }
 }

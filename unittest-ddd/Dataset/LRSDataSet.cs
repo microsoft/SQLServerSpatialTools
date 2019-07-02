@@ -21,11 +21,12 @@ namespace SQLSpatialTools.UnitTests.DDD
             public double EndMeasure { get; set; }
             public double Tolerance { get; set; }
         }
+
         public class ConvertToLrsGeomData : BaseDataSet
         {
             public const short ParamCount = 5;
             public const string TableName = "LRS_ConvertToLrsGeomData";
-            public const string DataFile = @"Dataset\LRS\ConvertToLrsGeomData.data";
+            public const string DataFile = @"TestData\LRS\ConvertToLrsGeomData.data";
             public static readonly string SelectQuery =
                 $"SELECT [Id], [InputGeom], [StartMeasure], [EndMeasure], [ExpectedResult1], [Comments] FROM [{TableName}];";
             public static readonly string InsertQuery =

@@ -1,17 +1,21 @@
 ﻿//------------------------------------------------------------------------------
-// Copyright (c) 2008 Microsoft Corporation.
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
 //------------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using Microsoft.SqlServer.Server;
 using Microsoft.SqlServer.Types;
+using SQLSpatialTools.Projections;
+using SQLSpatialTools.Sinks.Geography;
+using SQLSpatialTools.Sinks.Geometry;
+using SQLSpatialTools.Utility;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Types.SQL
 {
 	[Serializable]
 	[SqlUserDefinedType(Format.UserDefined, IsByteOrdered = false, MaxByteSize = -1, IsFixedLength = false)]
@@ -32,27 +36,20 @@ namespace SQLSpatialTools
 		public static SqlProjection Null
 		{
 			[SqlMethod(IsDeterministic = true, IsPrecise = true)]
-			get
-			{
-				return new SqlProjection();
-			}
-		}
+			get => new SqlProjection();
+        }
 
 		// TODO use WKT projection description format
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection Parse(SqlString s)
 		{
 			if (s.Value.Equals("NULL"))
-			{
-				return SqlProjection.Null;
-			}
-			else
-			{
-				string[] a = s.Value.Split(' ');
-				ConstructorInfo cons = Type.GetType(a[0]).GetConstructor(new Type[] { typeof(Dictionary<String, double>) });
-				return new SqlProjection((Projection)cons.Invoke(new object[] { Projection.ParseParameters(a[1]) }));
-			}
-		}
+				return Null;
+
+            var a = s.Value.Split(' ');
+            var cons = Type.GetType(a[0])?.GetConstructor(new[] { typeof(Dictionary<string, double>) });
+            return cons != null ? new SqlProjection((Projection) cons.Invoke(new object[] {Projection.ParseParameters(a[1])})) : Null;
+        }
 
 		// TODO use WKT projection description format
 		[return: SqlFacet(MaxSize = -1)]
@@ -72,112 +69,110 @@ namespace SQLSpatialTools
 		public bool IsNull
 		{
 			[SqlMethod(IsDeterministic = true, IsPrecise = true)]
-			get { return _projection == null; }
-		}
+			get => _projection == null;
+        }
 
 		public void Read(BinaryReader r)
 		{
-			if (r != null)
-			{
-				string name = r.ReadString();
-				if (name.Equals(""))
-				{
-					_projection = null;
-				}
-				else
-				{
-					ConstructorInfo cons = Type.GetType(name).GetConstructor(new Type[] { typeof(Dictionary<String, double>) });
-					_projection = (Projection)cons.Invoke(new object[] { Projection.ParseParameters(r.ReadString()) });
-				}
-			}
-		}
+            if (r == null) return;
+
+            var name = r.ReadString();
+            if (string.IsNullOrEmpty(name))
+            {
+                _projection = null;
+            }
+            else
+            {
+                var cons = Type.GetType(name)?.GetConstructor(new[] { typeof(Dictionary<string, double>) });
+                if (cons != null)
+                    _projection = (Projection) cons.Invoke(new object[] {Projection.ParseParameters(r.ReadString())});
+            }
+        }
 
 		public void Write(BinaryWriter w)
-		{
-			if (w != null)
-			{
-				if (_projection == null)
-				{
-					w.Write("");
-				}
-				else
-				{
-					w.Write(_projection.GetType().FullName);
-					w.Write(_projection.Parameters);
-				}
-			}
-		}
+        {
+            if (w == null) return;
+            if (_projection == null)
+            {
+                w.Write("");
+            }
+            else
+            {
+                w.Write(_projection.GetType().FullName ?? throw new InvalidOperationException());
+                w.Write(_projection.Parameters);
+            }
+        }
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection AlbersEqualArea(double longitude0, double latitude0, double parallel1, double parallel2)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			parameters["latitude0"] = latitude0;
-			parameters["parallel1"] = parallel1;
-			parameters["parallel2"] = parallel2;
-			return new SqlProjection(new AlbersEqualAreaProjection(parameters));
+            var parameters = new Dictionary<string, double>
+            {
+                ["longitude0"] = longitude0,
+                ["latitude0"] = latitude0,
+                ["parallel1"] = parallel1,
+                ["parallel2"] = parallel2
+            };
+            return new SqlProjection(new AlbersEqualAreaProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection Equirectangular(double longitude0, double parallel)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			parameters["parallel"] = parallel;
-			return new SqlProjection(new EquirectangularProjection(parameters));
+            var parameters = new Dictionary<string, double> {["longitude0"] = longitude0, ["parallel"] = parallel};
+            return new SqlProjection(new EquirectangularProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection LambertConformalConic(double longitude0, double latitude, double fi1, double fi2)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			parameters["latitude0"] = latitude;
-			parameters["fi1"] = fi1;
-			parameters["fi2"] = fi2;
-			return new SqlProjection(new LambertConformalConicProjection(parameters));
+            var parameters = new Dictionary<string, double>
+            {
+                ["longitude0"] = longitude0, ["latitude0"] = latitude, ["fi1"] = fi1, ["fi2"] = fi2
+            };
+            return new SqlProjection(new LambertConformalConicProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection Mercator(double longitude0)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			return new SqlProjection(new MercatorProjection(parameters));
+            var parameters = new Dictionary<string, double> {["longitude0"] = longitude0};
+            return new SqlProjection(new MercatorProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection ObliqueMercator(double longitude0, double fi1, double lambda1, double fi2, double lambda2)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			parameters["fi1"] = fi1;
-			parameters["lambda1"] = lambda1;
-			parameters["fi2"] = fi2;
-			parameters["lambda2"] = lambda2;
-			return new SqlProjection(new ObliqueMercatorProjection(parameters));
+            var parameters = new Dictionary<string, double>
+            {
+                ["longitude0"] = longitude0,
+                ["fi1"] = fi1,
+                ["lambda1"] = lambda1,
+                ["fi2"] = fi2,
+                ["lambda2"] = lambda2
+            };
+            return new SqlProjection(new ObliqueMercatorProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
-		public static SqlProjection TranverseMercator(double longitude0)
+		public static SqlProjection TransverseMercator(double longitude0)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = longitude0;
-			return new SqlProjection(new TranverseMercatorProjection(parameters));
+            var parameters = new Dictionary<string, double> {["longitude0"] = longitude0};
+            return new SqlProjection(new TransverseMercatorProjection(parameters));
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static SqlProjection Gnomonic(double longitude, double latitude)
 		{
-			Dictionary<String, double> parameters = new Dictionary<string, double>();
-			parameters["longitude0"] = 0;
-			parameters["longitude1"] = longitude;
-			parameters["latitude1"] = latitude;
-			return new SqlProjection(new GnommonicProjection(parameters));
+            var parameters = new Dictionary<string, double>
+            {
+                ["longitude0"] = 0, ["longitude1"] = longitude, ["latitude1"] = latitude
+            };
+            return new SqlProjection(new GnomonicProjection(parameters));
 		}
 
-		private static void ThrowIfArgumentNull(INullable argument, string name)
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+        private static void ThrowIfArgumentNull(INullable argument, string name)
 		{
 			if (argument == null || argument.IsNull)
 			{
@@ -195,13 +190,13 @@ namespace SQLSpatialTools
 		public SqlGeometry Project(SqlGeography geography)
 		{
 			ThrowIfArgumentNull(geography, "geography");
-			SqlGeometryBuilder builder = new SqlGeometryBuilder();
+			var builder = new SqlGeometryBuilder();
 			geography.Populate(new Projector(this, builder));
 			return builder.ConstructedGeometry;
 		}
 
-		// Uprojects geometry producing geography. 
-		// Returns a valid uprojected SqlGeography object.
+		// Unprojects geometry producing geography. 
+		// Returns a valid unprojected SqlGeography object.
 		//
 		// SRID taken from the geometry object may not be valid for geography,
 		// in which case a new SRID must be given.
@@ -211,21 +206,21 @@ namespace SQLSpatialTools
 		{
 			ThrowIfArgumentNull(geometry, "geometry");
 			ThrowIfArgumentNull(newSrid, "newSrid");
-			SqlGeographyBuilder builder = new SqlGeographyBuilder();
-			geometry.Populate(new Unprojector(this, builder, newSrid.Value));
+			var builder = new SqlGeographyBuilder();
+			geometry.Populate(new UnProjector(this, builder, newSrid.Value));
 			return builder.ConstructedGeography;
 		}
 
-		// Uprojects geometry producing geography.
+		// Unprojects geometry producing geography.
 		// This method assumes that the SRID of geometry object is valid for geography.
-		// Returns a valid uprojected SqlGeography object.
+		// Returns a valid unprojected SqlGeography object.
 		//
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public SqlGeography Unproject(SqlGeometry geometry)
 		{
 			ThrowIfArgumentNull(geometry, "geometry");
-			SqlGeographyBuilder builder = new SqlGeographyBuilder();
-			geometry.Populate(new Unprojector(this, builder, geometry.STSrid.Value)); // NOTE srid will be reused
+			var builder = new SqlGeographyBuilder();
+			geometry.Populate(new UnProjector(this, builder, geometry.STSrid.Value)); // NOTE srid will be reused
 			return builder.ConstructedGeography;
 		}
 
@@ -235,18 +230,18 @@ namespace SQLSpatialTools
 		//
 		public void ProjectPoint(double latitudeDeg, double longitudeDeg, out double x, out double y)
 		{
-			double latitude = MathX.InputLat(latitudeDeg, 90, "latitude");
-			double longitude = MathX.NormalizeLongitudeRad(MathX.InputLong(longitudeDeg, 15069, "longitude") - _projection.CentralLongitudeRad);
+			var latitude = MathX.InputLat(latitudeDeg, 90, "latitude");
+			var longitude = MathX.NormalizeLongitudeRad(MathX.InputLong(longitudeDeg, 15069, "longitude") - _projection.CentralLongitudeRad);
 
 			_projection.Project(latitude, longitude, out x, out y);
 
-			if (Double.IsNaN(x))
+			if (double.IsNaN(x))
 			{
-				throw new ArgumentOutOfRangeException("x");
+				throw new ArgumentOutOfRangeException(nameof(x));
 			}
-			if (Double.IsNaN(y))
+			if (double.IsNaN(y))
 			{
-				throw new ArgumentOutOfRangeException("y");
+				throw new ArgumentOutOfRangeException(nameof(y));
 			}
 		}
 
@@ -256,29 +251,28 @@ namespace SQLSpatialTools
 		//
 		public void UnprojectPoint(double x, double y, out double latitudeDeg, out double longitudeDeg)
 		{
-			if (Double.IsNaN(x))
+			if (double.IsNaN(x))
 			{
-				throw new ArgumentException(Resource.InputCoordinateIsNaN, "x");
+				throw new ArgumentException(Resource.InputCoordinateIsNaN, nameof(x));
 			}
-			if (Double.IsNaN(y))
+			if (double.IsNaN(y))
 			{
-				throw new ArgumentException(Resource.InputCoordinateIsNaN, "y");
-			}
-
-			double latitude, longitude;
-			_projection.Unproject(x, y, out latitude, out longitude);
-
-			if (Double.IsNaN(latitude) || latitude < -Math.PI / 2 || latitude > Math.PI / 2)
-			{
-				throw new ArgumentOutOfRangeException("latitude", String.Format(CultureInfo.InvariantCulture, Resource.OutputLatitudeIsOutOfRange, latitude));
-			}
-			if (Double.IsNaN(longitude) || longitude < -Math.PI || longitude > Math.PI)
-			{
-				throw new ArgumentOutOfRangeException("longitude", String.Format(CultureInfo.InvariantCulture, Resource.OutputLongitudeIsOutOfRange, longitude));
+				throw new ArgumentException(Resource.InputCoordinateIsNaN, nameof(y));
 			}
 
-			latitudeDeg = MathX.Clamp(90, Util.ToDegrees(latitude));
-			longitudeDeg = MathX.NormalizeLongitudeDeg(Util.ToDegrees(longitude + _projection.CentralLongitudeRad));
+            _projection.Unproject(x, y, out var latitude, out var longitude);
+
+			if (double.IsNaN(latitude) || latitude < -Math.PI / 2 || latitude > Math.PI / 2)
+			{
+				throw new ArgumentOutOfRangeException(nameof(latitude), string.Format(CultureInfo.InvariantCulture, Resource.OutputLatitudeIsOutOfRange, latitude));
+			}
+			if (double.IsNaN(longitude) || longitude < -Math.PI || longitude > Math.PI)
+			{
+				throw new ArgumentOutOfRangeException(nameof(longitude), string.Format(CultureInfo.InvariantCulture, Resource.OutputLongitudeIsOutOfRange, longitude));
+			}
+
+			latitudeDeg = MathX.Clamp(90, SpatialUtil.ToDegrees(latitude));
+			longitudeDeg = MathX.NormalizeLongitudeDeg(SpatialUtil.ToDegrees(longitude + _projection.CentralLongitudeRad));
 		}
 	}
 }

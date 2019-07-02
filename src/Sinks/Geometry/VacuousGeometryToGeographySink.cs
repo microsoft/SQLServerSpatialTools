@@ -1,19 +1,18 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.SqlServer.Types;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Sinks.Geometry
 {
-	/**
-	 * This class implements a completely trivial conversion from geometry to geography, simply taking each
-	 * point (x, y) --> (long, lat).  The class takes a target geography sink, as well as the target SRID to
-	 * assign to the results.
-	 */
-	public class VacuousGeometryToGeographySink : IGeometrySink110
+    /// <summary>
+    /// This class implements a completely trivial conversion from geometry to geography, simply taking each
+    /// point(x, y) --> (long, lat).  The class takes a target geography sink, as well as the target SRID to
+    /// assign to the results.
+    /// </summary>
+    public class VacuousGeometryToGeographySink : IGeometrySink110
 	{
 		private readonly IGeographySink110 _target;
 		private readonly int _targetSrid;

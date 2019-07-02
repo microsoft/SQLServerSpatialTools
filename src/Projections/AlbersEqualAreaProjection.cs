@@ -1,85 +1,85 @@
 //------------------------------------------------------------------------------
-// Copyright (c) 2008 Microsoft Corporation.
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
 //
 // References: http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html
 //------------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Projections
 {
 	// EPSG Code:    9822
 	// OGC WKT Name: Albers_Conic_Equal_Area
 	internal sealed class AlbersEqualAreaProjection : Projection
 	{
 		// longitude0, latitude0, parallel1, parallel2
-		public AlbersEqualAreaProjection(Dictionary<String,double> parameters)
+		public AlbersEqualAreaProjection(IDictionary<string, double> parameters)
 			: base(parameters)
 		{
-			double latitude0_rad = InputLatitude("latitude0");
-			double parallel1_rad = InputLatitude("parallel1");
-			double parallel2_rad = InputLatitude("parallel2");
+            var latitude0Rad = InputLatitude("latitude0");
+			var parallel1Rad = InputLatitude("parallel1");
+			var parallel2Rad = InputLatitude("parallel2");
 
-			double cos_parallel1 = Math.Cos(parallel1_rad);
-			double sin_parallel1 = Math.Sin(parallel1_rad);
+			var cosParallel1 = Math.Cos(parallel1Rad);
+			var sinParallel1 = Math.Sin(parallel1Rad);
 
-			_n2 = sin_parallel1 + Math.Sin(parallel2_rad);
+			_n2 = sinParallel1 + Math.Sin(parallel2Rad);
 			if (Math.Abs(_n2) <= MathX.Tolerance)
 			{
 				throw new ArgumentOutOfRangeException();
 			}
 
 			_n = _n2 / 2;
-			_n_half = _n2 / 4;
-			_inv_n2 = 1 / _n2;
-			_inv_n = 2 / _n2;
+			_nHalf = _n2 / 4;
+			var invN2 = 1 / _n2;
+			_invN = 2 / _n2;
 
-			_c = MathX.Square(cos_parallel1) + sin_parallel1 * _n2;
-			_c_over_n2 = _c * _inv_n2;
+			_c = MathX.Square(cosParallel1) + sinParallel1 * _n2;
+			_cOverN2 = _c * invN2;
 
-			double a = _c - Math.Sin(latitude0_rad) * _n2;
+			var a = _c - Math.Sin(latitude0Rad) * _n2;
 			if (a < 0)
 			{
 				throw new ArgumentOutOfRangeException();
 			}
-			_ro_0 = Math.Sqrt(a) * _inv_n;
+			_ro0 = Math.Sqrt(a) * _invN;
 		}
 
 		protected internal override void Project(double latitude, double longitude, out double x, out double y)
 		{
-			double a = _c - Math.Sin(latitude) * _n2;
+			var a = _c - Math.Sin(latitude) * _n2;
 			if (a < 0)
 			{
-				throw new ArgumentOutOfRangeException("latitude");
+				throw new ArgumentOutOfRangeException(nameof(latitude));
 			}
 
-			double ro = Math.Sqrt(a) * _inv_n;
+			var ro = Math.Sqrt(a) * _invN;
 	
-			double tetha = longitude * _n;
-			x = ro * Math.Sin(tetha);
-			y = _ro_0 - ro * Math.Cos(tetha);
+			var theta = longitude * _n;
+			x = ro * Math.Sin(theta);
+			y = _ro0 - ro * Math.Cos(theta);
 		}
 
 		protected internal override void Unproject(double x, double y, out double latitude, out double longitude)
 		{
-			double ros = x * x + (_ro_0 - y) * (_ro_0 - y);
-			double a = _c_over_n2 - ros * _n_half;
-			if (Double.IsNaN(a) || Math.Abs(a) > 1 + MathX.Tolerance)
+			var ros = x * x + (_ro0 - y) * (_ro0 - y);
+			var a = _cOverN2 - ros * _nHalf;
+			if (double.IsNaN(a) || Math.Abs(a) > 1 + MathX.Tolerance)
 			{
-				throw new ArgumentOutOfRangeException("x, y");
+				throw new ArgumentOutOfRangeException(paramName:string.Join(",", new []{nameof(x),nameof(y)}));
 			}
 
 			latitude = Math.Asin(MathX.Clamp(1, a));
-			longitude = MathX.Clamp(Math.PI, MathX.Atan2(x, _ro_0 - y, "x, y") * _inv_n);
+			longitude = MathX.Clamp(Math.PI, MathX.Atan2(x, _ro0 - y, "x, y") * _invN);
 		}
 
 		private readonly double _c;
-		private readonly double _c_over_n2;
-		private readonly double _ro_0;
+		private readonly double _cOverN2;
+		private readonly double _ro0;
 		private readonly double _n2;
 		private readonly double _n;
-		private readonly double _n_half;
-		private readonly double _inv_n2;
-		private readonly double _inv_n;
+		private readonly double _nHalf;
+        private readonly double _invN;
 	}
 }

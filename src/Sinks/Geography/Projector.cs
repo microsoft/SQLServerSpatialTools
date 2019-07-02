@@ -1,11 +1,16 @@
 ﻿//------------------------------------------------------------------------------
-// Copyright (c) 2008 Microsoft Corporation.
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
 //------------------------------------------------------------------------------
+
 using System;
 using Microsoft.SqlServer.Types;
+using SQLSpatialTools.Types.SQL;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Sinks.Geography
 {
+    /// <summary>
+    /// This class projects a geography segment based on specified project to a geometry segment.
+    /// </summary>
 	public sealed class Projector : IGeographySink110
 	{
 		private readonly SqlProjection _projection;
@@ -27,18 +32,16 @@ namespace SQLSpatialTools
 			_sink.EndGeometry();
 		}
 
-		public void BeginFigure(double latitude, double longitude, Nullable<double> z, Nullable<double> m)
+		public void BeginFigure(double latitude, double longitude, double? z, double? m)
 		{
-			double x, y;
-			_projection.ProjectPoint(latitude, longitude, out x, out y);
-			_sink.BeginFigure(x, y, z, m);
+            _projection.ProjectPoint(latitude, longitude, out var x, out var y);
+            _sink.BeginFigure(x, y, z, m);
 		}
 
-		public void AddLine(double latitude, double longitude, Nullable<double> z, Nullable<double> m)
+		public void AddLine(double latitude, double longitude, double? z, double? m)
 		{
-			double x, y;
-			_projection.ProjectPoint(latitude, longitude, out x, out y);
-			_sink.AddLine(x, y, z, m);
+            _projection.ProjectPoint(latitude, longitude, out var x, out var y);
+            _sink.AddLine(x, y, z, m);
 		}
 
         public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
