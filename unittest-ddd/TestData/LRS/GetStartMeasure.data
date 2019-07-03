@@ -1,0 +1,17 @@
+﻿## Comments
+## GetStartMeasureTest
+
+## [InputGeom] nvarchar(1000) NOT NULL
+## [ExpectedStartMeasure] float NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+## [InputGeom]                              ||[ExpectedStartMeasure]     ||[Comments]
+LINESTRING ( 1 1 NULL  1, 25 1 NULL 25)     || 1                         ||
+LINESTRING (15 1 NULL 15, 25 1 NULL 25)     ||15                         ||
+LINESTRING ( 7 1 NULL  7, 25 1 NULL 25)     || 7                         ||
+LINESTRING (11 1 NULL 11, 25 1 NULL 25)     ||11                         ||
+LINESTRING (13 1 NULL 13, 25 1 NULL 25)     ||13                         ||
+LINESTRING (16 1 NULL 16, 25 1 NULL 25)     ||16                         ||
+LINESTRING (12 1 NULL 12, 25 1 NULL 25)     ||12                         ||

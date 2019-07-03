@@ -1,0 +1,33 @@
+﻿## Comments
+## IsConnectedTest
+
+## [InputGeom1] nvarchar(1000) NOT NULL
+## [InputGeom2] nvarchar(1000) NOT NULL
+## [Tolerance] float NOT NULL
+## [Expected] bit NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+
+## [InputGeom1]                                         ||[InputGeom2]                                                        ||[Tolerance]   ||[Expected]     ||[Comments]
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(0.5 0.5 0 0, 2 2 0 0)                                    ||0.5           ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(0.5 0 0 0, 2 2 0 0)                                      ||0.5           ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(0.5 0 0 0, 2 2 0 0)                                      ||0.5           ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(0.5 0 0 0, 5.5 5 0 0)                                    ||0.5           ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.45 4.95 0 0)                                ||0.05          ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.5 4.95 0 0)                                 ||0.05          ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.44 4.95 0 0)                                ||0.05          ||0              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.46 4.95 0 0)                                ||0.05          ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.46 4.94 0 0)                                ||0.05          ||0              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||LINESTRING(10 10 0 0, 5.46 4.97 0 0)                                ||0.05          ||1              ||
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||POINT(0 0 0 0)                                                      ||0.05          ||1              ||checking function property with normal point and linestring value
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||POINT(0.5 0.5 0 0.2)                                                ||0.5           ||1              ||checking function property By changing tolerence value
+LINESTRING(0 0 0 0, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)        ||POINT(0.5 0.9 0 0.2)                                                ||0.5           ||1              ||if point value is greater than tolerance value
+LINESTRING(0.4 0 0 0.3, 1 1 0 0, 3 4 0 0, 5.5 5 0 0)    ||POINT(0.5 0.4 0 0.5)                                                ||0.5           ||1              ||Checking function property by changing start point value within the range of tolerance value and comparing with point
+LINESTRING(0 0 0 , 1 1 0 , 3 4 0 , 5.5 5 0 )            ||MULTILINESTRING ((2 2 0 , 2 4 2), (8 4 8, 12 4 12, 6 5 0))          ||0.5           ||1              ||checking function property with normal Multilinestring and linestring value using tolerance value
+POINT(1 1 1 )                                           ||MULTILINESTRING ((2 2 0 , 2 4 2), (8 4 8, 12 4 12, 0.3 0.2 0.1))    ||0.9           ||1              ||checking function property with normal Multilinestring and point value using tolerance value
+MULTILINESTRING ((2 2.2 0.7 , 3 8 2), (9 8 0, 12 4 12)) ||MULTILINESTRING ((2 2 0 , 2 4 2), (8 4 8, 12 4 12, 0.3 0.2 0.1))    ||0.7           ||1              ||checking function property with normal Multilinestring and Multilinestring value using tolerance value
+MULTILINESTRING ((2 2.2 0.7 , 2 2), (9 8 0, 12 4 12))   ||MULTILINESTRING ((2 2 0 , 2 4 2), (8 4 8, 12 4 12, 3 0.2 0.1))      ||0.7           ||1              ||if middle point of both multilinestring is same
+MULTILINESTRING ((2 2.2 0.7 , 3 8 2), (9 8 0, 12 4 12)) ||MULTILINESTRING ((3 8 2 , 2 4 2), (8 4 8, 12 4 12, 0.3 10 0.1))     ||0.5           ||1              ||if middle point of one multilinestring is same to another multilinestring start point 
+MULTILINESTRING ((2 5 0.7 , 3 8 2), (8 4 8, 12 4 12))   ||MULTILINESTRING ((2 2 0 , 2 4 2), (8 4 8, 12 4 12, 0.3 0.2 0.1))    ||0.5           ||1              ||putting tolerace value of start point out of range

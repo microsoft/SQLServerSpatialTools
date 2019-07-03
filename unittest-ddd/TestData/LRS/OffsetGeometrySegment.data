@@ -1,0 +1,66 @@
+﻿## Comments
+## OffsetGeometrySegmentTest
+
+## [InputGeom] nvarchar(1000) NOT NULL
+## [StartMeasure] float NOT NULL
+## [EndMeasure] float NOT NULL
+## [ExpectedGeom] nvarchar(1000) NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+## [InputGeom]                                                              ||[StartMeasure]    ||[EndMeasure]  ||[Offset]  ||[Tolerance]   ||[ExpectedGeom]                                                               ||[Comments]
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||15                ||20            ||2         ||0.5           ||LINESTRING (15 1 NULL 15, 20 1 NULL 20)                                      ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||12                ||15            ||3         ||0.5           ||LINESTRING (12.000000000000002 1 12, 15 1 15)                                ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||10                ||14            ||5         ||0.5           ||LINESTRING (10 1 NULL 10, 14 1 NULL 14)                                      ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||11                ||15            ||2         ||0.5           ||LINESTRING (11 1 NULL 11, 15 1 NULL 15)                                      ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||13                ||17            ||-2        ||0.5           ||LINESTRING (13 1 NULL 13, 17 1 NULL 17)                                      ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||14                ||16            ||2         ||0.5           ||LINESTRING (14 1 NULL 14, 16 1 NULL 16)                                      ||
+LINESTRING (10 1 NULL 10, 25 1 NULL 25)                                     ||14                ||16            ||2         ||0.5           ||LINESTRING (14 1 NULL 14, 16 1 NULL 16)                                      ||
+LINESTRING (100 50 NULL 100, 150 50 NULL 150)                               ||101               ||120           ||-4        ||0.5           ||LINESTRING (101 50 NULL 101, 120 50 NULL 120)                                ||
+LINESTRING (200000 100000 0, 200500 100000 500)                             ||0                 ||500           ||2         ||0.5           ||LINESTRING (200000 100000 0, 200500 100000 500)                              ||
+LINESTRING (200000 100000 0, 200500 100000 500)                             ||0                 ||500           ||2         ||0.5           ||LINESTRING (200000 100000 0, 200500 100000 500)                              ||
+LINESTRING (200000 100000 0, 200000 100500 500)                             ||0                 ||500           ||2         ||0.5           ||LINESTRING (200000 100000 0, 200000 100500 500)                              ||
+LINESTRING (200000 100000 0, 200000 100500 500)                             ||0                 ||500           ||2         ||0.5           ||LINESTRING (200000 100000 0, 200000 100500 500)                              ||
+LINESTRING (206025 104050 0, 206200 104050 175, 206400 104000 381.155)      ||0                 || 381.155      ||2         ||0.5           ||LINESTRING (206025 104050 0, 206200 104050 175, 206400 104000 381.155)       ||
+LINESTRING (206025 104050 0, 206200 104050 175, 206400 104000 381.155)      ||0                 || 381.155      ||2         ||0.5           ||LINESTRING (206025 104050 0, 206200 104050 175, 206400 104000 381.155)       ||
+LINESTRING (205500 104000 0, 205700 104050 206.155, 205850 104050 356.155)  ||0                 || 356.155      ||2         ||0.5           ||LINESTRING (205500 104000 0, 205700 104050 206.155, 205850 104050 356.155)   ||
+## POINT Types
+POINT(5 5 10) ||0   ||9     ||2     ||0.5   ||NULL              ||Point Input
+POINT(5 5 10) ||0   ||10    ||2     ||0.5   ||NULL              ||Point Input
+POINT(5 5 10) ||10  ||10    ||2     ||0.5   ||POINT(5 5 10)     ||Point Input
+POINT(5 5 10) ||9   ||9     ||2     ||0.5   ||NULL              ||Point Input
+POINT(5 5 10) ||11  ||11    ||2     ||0.5   ||NULL              ||Point Input
+POINT(5 5 10) ||11  ||14    ||2     ||0.5   ||NULL              ||Point Input
+## MULTILINESTRING Types
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||0      ||15       ||2    ||0.5    ||NULL  ||Multiline start and end measure beyond range
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||-5     ||-1       ||2    ||0.5    ||NULL  ||Multiline start and end measure less than start measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||-1     ||-5       ||2    ||0.5    ||NULL  ||Multiline start and end measure less than start measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||1      ||-5       ||2    ||0.5    ||NULL  ||Multiline end measure less than start measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||-5     ||1        ||2    ||0.5    ||NULL  ||Multiline start measure less than start measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||13     ||20       ||2    ||0.5    ||NULL  ||Multiline start and end measure greater than end measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||20     ||13       ||2    ||0.5    ||NULL  ||Multiline start and end measure greater than end measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||20     ||12       ||2    ||0.5    ||NULL  ||Multiline start measure greater than end measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||12     ||20       ||2    ||0.5    ||NULL  ||Multiline measure greater than end measure of segment
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2      ||20       ||2    ||0.5    ||NULL  ||Multiline measure within range and start shape point measure
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.3    ||20       ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.6    ||20       ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.7    ||20       ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2      ||11.5     ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2      ||10.6     ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2      ||11       ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.6    ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.6    ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.5    ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.45   ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.4    ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.38   ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.37   ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.35   ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||2.33   ||3        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||4.2    ||6        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||4.5    ||6        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||5      ||6        ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12)) ||9      ||10.6     ||2    ||0.5    ||NULL  ||Multiline measure within range and start not a shape point measure and within tolerance
+LINESTRING(-122.360 47.656 47.656, -122.343 47.656 47.656, -122.310 47.690 47.656, -122.310 47.670 47.656, -122.300 47.630 47.656)                    ||47.656 ||47.630   ||2    ||3      ||NULL  ||Special
+LINESTRING(-122.360 47.656 4, -122.343 47.656 4, -122.310 47.690 4, -122.310 47.670 4, -122.300 47.630 4)                   ||4         ||4   ||0.001   ||3.5      ||NULL  ||Special

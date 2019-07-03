@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SQLSpatialTools</RootNamespace>
+    <AssemblyName>SQLSpatialTools</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\output\lib</OutputPath>
+    <IntermediateOutputPath>..\output\intermediate\lib</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\output\lib</OutputPath>
+    <IntermediateOutputPath>..\output\intermediate\lib</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SpatialTools.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Functions\General\Geometry.cs" />
+    <Compile Include="Functions\LRS\Geometry.cs" />
+    <Compile Include="Functions\Util\Geometry.cs" />
+    <Compile Include="Sinks\Geometry\ExtractPolygonFromLineGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\BuildMultiLineFromLinesSink.cs" />
+    <Compile Include="Sinks\Geometry\ClipMGeometrySegmentSink.cs" />
+    <Compile Include="Sinks\Geometry\ReverseLinearGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\MultiplyMeasureGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\ScaleGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\TranslateMeasureGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\ReverseAndTranslateGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\LineStringMergeGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\LocateMAlongGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\ResetMGeometrySink.cs" />
+    <Compile Include="KMLProcessor\Constants.cs" />
+    <Compile Include="KMLProcessor\Export\ExportContext.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageBase.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageGeography.cs" />
+    <Compile Include="KMLProcessor\Export\KeyholeMarkupLanguageGeometry.cs" />
+    <Compile Include="KMLProcessor\FilterSetSridGeographySink.cs" />
+    <Compile Include="KMLProcessor\GeographyContext.cs" />
+    <Compile Include="KMLProcessor\Import\AltitudeMode.cs" />
+    <Compile Include="KMLProcessor\Import\Geography.cs" />
+    <Compile Include="KMLProcessor\Import\GroundOverlay.cs" />
+    <Compile Include="KMLProcessor\Import\KMLParser.cs" />
+    <Compile Include="KMLProcessor\Import\KMLProcessor.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonAltBox.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonBox.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonBoxBase.cs" />
+    <Compile Include="KMLProcessor\Import\LatLonQuad.cs" />
+    <Compile Include="KMLProcessor\Import\LinearRing.cs" />
+    <Compile Include="KMLProcessor\Import\LineString.cs" />
+    <Compile Include="KMLProcessor\Import\Model.cs" />
+    <Compile Include="KMLProcessor\Import\MultiGeometry.cs" />
+    <Compile Include="KMLProcessor\Import\Placemark.cs" />
+    <Compile Include="KMLProcessor\Import\Point.cs" />
+    <Compile Include="KMLProcessor\Import\Polygon.cs" />
+    <Compile Include="KMLProcessor\Import\Region.cs" />
+    <Compile Include="KMLProcessor\KMLException.cs" />
+    <Compile Include="KMLProcessor\KmlFunctions.cs" />
+    <Compile Include="KMLProcessor\Utilities.cs" />
+    <Compile Include="Projections\GnomonicProjection.cs" />
+    <Compile Include="Sinks\Geography\GeographyFilters.cs" />
+    <Compile Include="Sinks\Geometry\GeometryFilters.cs" />
+    <Compile Include="Sinks\Geometry\GeometryToPointGeographySink.cs" />
+    <Compile Include="Sinks\Geometry\GISTypeCheckGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\BuildLRSMultiLineSink.cs" />
+    <Compile Include="Sinks\Geometry\PopulateGeometryMeasuresSink.cs" />
+    <Compile Include="Sinks\Geometry\SplitGeometrySegmentSink.cs" />
+    <Compile Include="Sinks\Geography\VacuousGeographyToGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\VacuousGeometryToGeographySink.cs" />
+    <Compile Include="Types\LRSEnumerator.cs" />
+    <Compile Include="Types\LRSLine.cs" />
+    <Compile Include="Types\LRSMultiLine.cs" />
+    <Compile Include="Types\LRSPoint.cs" />
+    <Compile Include="Types\Vertex.cs" />
+    <Compile Include="Utility\EnumsAndConstants.cs" />
+    <Compile Include="Utility\ErrorMessage.cs" />
+    <Compile Include="Utility\SpatialExtensions.cs" />
+    <Compile Include="Types\SQL\AffineTransform.cs" />
+    <Compile Include="Aggregates\GeometryEnvelopeAggregate.cs" />
+    <Compile Include="Aggregates\GeographyUnionAggregate.cs" />
+    <Compile Include="Projections\AlbersEqualAreaProjection.cs" />
+    <Compile Include="Projections\EquirectangularProjection.cs" />
+    <Compile Include="Projections\LambertConformalConicProjection.cs" />
+    <Compile Include="Projections\MathX.cs" />
+    <Compile Include="Projections\MercatorProjection.cs" />
+    <Compile Include="Projections\ObliqueMercatorProjection.cs" />
+    <Compile Include="Projections\Projection.cs" />
+    <Compile Include="Resource\Resource.Designer.cs" />
+    <Compile Include="Sinks\Geometry\GeometryTransformer.cs" />
+    <Compile Include="Types\SQL\SqlProjection.cs" />
+    <Compile Include="Projections\TransverseMercatorProjection.cs" />
+    <Compile Include="Sinks\Geography\DensifyGeographySink.cs" />
+    <Compile Include="Sinks\Geometry\LocateAlongGeometrySink.cs" />
+    <Compile Include="Functions\General\Geography.cs" />
+    <Compile Include="Sinks\Geography\LocateAlongGeographySink.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sinks\Geography\Projector.cs" />
+    <Compile Include="Sinks\Geometry\ShiftGeometrySink.cs" />
+    <Compile Include="Sinks\Geometry\UnProjector.cs" />
+    <Compile Include="Sinks\Geometry\ConvertXYZ2XYMGeometrySink.cs" />
+    <Compile Include="Utility\SQLTypeConversions.cs" />
+    <Compile Include="Utility\SpatialUtil.cs" />
+    <Compile Include="Types\Vector3.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="SQL Scripts\aggregate_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\makevalid_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\projection_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\lrs_geometry_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\Register.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\transform_example.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SQL Scripts\Unregister.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource\Resource.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SQL Scripts\RegisterAndValidate.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SQL Scripts\util_geometry_example.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. %0AUse NuGet Package Restore to download them.  %0AFor more information, see http://go.microsoft.com/fwlink/?LinkID=322105. %0AThe missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll'))" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if exist "$(ProjectDir)obj" rd "$(ProjectDir)obj" /S /Q
+powershell.exe -ExecutionPolicy Unrestricted [io.file]::WriteAllText('$(TargetDir)SQL Scripts\Register.sql', ((gc '$(TargetDir)SQL Scripts\Register.sql') -replace 'DLLPath', '$(TargetPath)' -join \"`r`n\"))
+powershell.exe -ExecutionPolicy Unrestricted [io.file]::WriteAllText('$(TargetDir)SQL Scripts\RegisterAndValidate.sql', ((gc '$(TargetDir)SQL Scripts\RegisterAndValidate.sql') -replace 'ScriptDirPath', '$(TargetDir)SQL Scripts' -join \"`r`n\"))
+exit 0</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

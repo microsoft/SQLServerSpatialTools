@@ -1,0 +1,15 @@
+﻿## Comments
+## ResetMeasureTest
+
+## [InputGeom] nvarchar(1000) NOT NULL
+## [ExpectedGoem] nvarchar(1000) NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+## [InputGeom]                                                                            ||[ExpectedGeom]                                                                           ||[Comments]
+LINESTRING (10 1 NULL 10, 25 1 NULL 25 )                                                  ||LINESTRING (10 1 NULL NULL, 25 1 NULL NULL )                                             ||
+LINESTRING (12.5467 1 NULL 10, 35 1 NULL 25 )                                             ||LINESTRING (12.5467 1 NULL NULL, 35 1 NULL NULL )                                        ||
+LINESTRING (14 1 NULL  6, 40.3453 1 NULL  7 )                                             ||LINESTRING (14 1 NULL NULL, 40.3453 1 NULL NULL )                                        ||
+MULTILINESTRING ((14 1 NULL 6, 40.3453 1 NULL 7 ),(14 1 NULL 7, 40.3453 1 NULL 10 ))      ||MULTILINESTRING ((14 1, 40.3453 1), (14 1, 40.3453 1))                                   ||
+POINT(5 7 8)                                                                              ||POINT(5 7)                                                                               ||

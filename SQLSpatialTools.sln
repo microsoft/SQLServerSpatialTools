@@ -3,19 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools", "SQLSpatialTools.csproj", "{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools", "src\SQLSpatialTools.csproj", "{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{54D9E1A5-35A2-45C1-92CB-78B1FE399CD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools.UnitTests", "unittest\SQLSpatialTools.UnitTests.csproj", "{5FCDB549-1B10-4115-9A3F-AA55584FEA23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{FDEEA275-E34A-465E-836C-F297B4FECDB9}"
 	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-		Performance2.psess = Performance2.psess
-		Performance3.psess = Performance3.psess
+		License.txt = License.txt
+		Readme.txt = Readme.txt
+		SpatialTools.pfx = SpatialTools.pfx
+		SQLSpatialTools.sln.DotSettings = SQLSpatialTools.sln.DotSettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools.UnitTests.DDD", "unittest-ddd\SQLSpatialTools.UnitTests.DDD.csproj", "{7DD9477E-5D3B-4731-85E3-DE5A76C2D204}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools.UnitTests.Extension", "unittest-extension\SQLSpatialTools.UnitTests.Extension.csproj", "{98EFE72E-E303-4BDE-B86F-5F704DB3F5BE}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -25,12 +29,27 @@ Global
 		{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09428C16-7DAE-4C28-A853-E4F04DD0BEDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FCDB549-1B10-4115-9A3F-AA55584FEA23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FCDB549-1B10-4115-9A3F-AA55584FEA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FCDB549-1B10-4115-9A3F-AA55584FEA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FCDB549-1B10-4115-9A3F-AA55584FEA23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DD9477E-5D3B-4731-85E3-DE5A76C2D204}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DD9477E-5D3B-4731-85E3-DE5A76C2D204}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DD9477E-5D3B-4731-85E3-DE5A76C2D204}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DD9477E-5D3B-4731-85E3-DE5A76C2D204}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98EFE72E-E303-4BDE-B86F-5F704DB3F5BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98EFE72E-E303-4BDE-B86F-5F704DB3F5BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98EFE72E-E303-4BDE-B86F-5F704DB3F5BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98EFE72E-E303-4BDE-B86F-5F704DB3F5BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28138FE6-3CEC-4C1C-BFCA-35186C9246EF}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
