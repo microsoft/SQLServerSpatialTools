@@ -1,0 +1,22 @@
+﻿## Comments
+## ValidateLRSGeometry
+
+## [InputGeom] nvarchar(1000) NOT NULL
+## [ExpectedResult1] float NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+
+## [InputGeom]                                                              ||[ExpectedResult1]     ||[Comments]
+GEOMETRYCOLLECTION(LINESTRING(1 1 1, 3 5 2))                                ||13331                 ||
+LINESTRING(1 1, 3 5)                                                        ||13331                 ||
+MULTILINESTRING ((2 2, 2 4), (8 4, 12 4 ))                                  ||13331                 ||
+LINESTRING (2 2 0, 2 4 2, 8 4 8, 12 4 12, 12 10 29, 8 10 22, 5 14 27)       ||13333                 ||
+LINESTRING (2 2 6, 2 4 2, 8 4 8)                                            ||13333                 ||
+MULTILINESTRING ((2 2 2, 2 4 4), (8 4 2, 12 4 4, 12 10 6))                  ||13333                 ||
+MULTILINESTRING ((2 2 2, 2 4 4), (8 4 4, 12 4 2, 12 10 29))                 ||13333                 ||
+MULTILINESTRING ((2 2 2, 2 4 0), (8 4 8, 12 4 12, 12 10 29))                ||13333                 ||
+LINESTRING(1 1 1, 3 5 2)                                                    ||TRUE                  ||
+MULTILINESTRING ((2 2 2, 2 4 2), (8 4 8, 12 4 12, 12 10 29))                ||TRUE                  ||
+POINT (2 2)                                                                 ||13331                 ||

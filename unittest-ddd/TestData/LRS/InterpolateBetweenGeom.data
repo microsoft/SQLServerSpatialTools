@@ -1,0 +1,19 @@
+﻿## Comments
+## InterpolateBetweenGeomTest
+
+## [InputGeom1] nvarchar(1000) NOT NULL
+## [InputGeom2] nvarchar(1000) NOT NULL
+## [Measure] float NOT NULL
+## [ExpectedPoint] float NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated
+## [InputGeom1]         ||[InputGeom2]              ||[Measure]     ||[ExpectedPoint]                            ||[Comments]
+POINT ( 1 1 NULL  1)    ||POINT (25 1 NULL 25)      || 5            ||POINT (5 1 NULL 5)                         ||
+POINT (15 1 NULL 10)    ||POINT (25 1 NULL 25)      ||17            ||POINT (19.6666666666667 1 NULL 17)         ||
+POINT ( 7 1 NULL 10)    ||POINT (25 1 NULL 25)      ||10            ||POINT (7 1 NULL 10)                        ||
+POINT (11 1 NULL 10)    ||POINT (25 1 NULL 25)      ||14            ||POINT (14.7333333333333 1 NULL 14)         ||
+POINT (13 1 NULL 10)    ||POINT (25 1 NULL 25)      ||19            ||POINT (20.2 1 NULL 19)                     ||
+POINT (16 1 NULL 10)    ||POINT (25 1 NULL 25)      ||20            ||POINT (22 1 NULL 20)                       ||
+POINT (12 1 NULL 10)    ||POINT (25 1 NULL 25)      ||22            ||POINT (22.4 1 NULL 22)                     ||

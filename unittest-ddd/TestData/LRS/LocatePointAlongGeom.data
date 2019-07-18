@@ -1,0 +1,23 @@
+﻿## Comments
+## LocatePointAlongGeom Test
+
+## [InputGeom1] nvarchar(1000) NOT NULL
+## [Measure] float NOT NULL
+## [ExpectedGeom] bit NOT NULL
+
+## Each line represents one test data to be inserted in DB
+## Parameter Separator ||
+## Should follow the same order of parameter; white space at the start and end of each param will be truncated                                                                                         
+## [InputGeom]                                                                                                                      ||[Measure]         ||[ExpectedPoint]                                   ||[Comments]
+LINESTRING (0 0 0 0, 10 0 0 10)                                                                                                     ||5                 ||Point(5 0 NULL 5)                                 ||
+LINESTRING (0 0 0 0, 20 0 0 15)                                                                                                     ||12                ||POINT (16 0 NULL 12)                              ||
+LINESTRING (0 0 0 0, 15 0 0 20)                                                                                                     ||15                ||POINT (11.25 0 NULL 15)                           ||
+LINESTRING (0 0 0 0, 10 0 0 40)                                                                                                     ||7                 ||POINT (1.75 0 NULL 7)                             ||
+LINESTRING (5 10 10, 20 5 30.628, 35 10 61.257, 55 10 100)                                                                          ||30.4              ||POINT (19.8342059336824 5.05526468877254 30.4)    ||
+LINESTRING (5 10 10, 20 5 30.628, 35 10 61.257, 55 10 100)                                                                          ||10                ||POINT (5 10 10)                                   ||Shape Point
+LINESTRING (5 10 10, 20 5 30.628, 35 10 61.257, 55 10 100)                                                                          ||30.68             ||POINT (20 5 30.628)                               ||Shape Point
+LINESTRING (5 10 10, 20 5 30.628, 35 10 61.257, 55 10 100)                                                                          ||61.257            ||POINT (35 10 61.257)                              ||Shape Point
+LINESTRING (5 10 10, 20 5 30.628, 35 10 61.257, 55 10 100)                                                                          ||100               ||POINT (55 10 100)                                 ||Shape Point
+MULTILINESTRING((1 1 1,2 2 2),(3 3 3, 5 5 7))                                                                                       ||5                 ||POINT (4 4 5)                                     ||
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5.125 5.125 5.125, 6 6 6), (10 10 10, 11.25 11.25 11.25, 12 12 12))                  ||9                 ||NULL                                              ||
+MULTILINESTRING((1 1 1, 2 2 2, 3 3 3), (4 4 4, 5 5 5, 6 6 6), (8 8 8, 9 9 9, 10 10 10), (11 11 11, 12 12 12, 13 13 13, 14 14 14))   ||5                 ||POINT (5 5 5)                                     ||
