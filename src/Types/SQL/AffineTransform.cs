@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------------
-// Copyright (c) 2008 Microsoft Corporation.
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
 //------------------------------------------------------------------------------
 
 using System;
@@ -7,121 +7,109 @@ using System.IO;
 using System.Data.SqlTypes;
 using Microsoft.SqlServer.Server;
 using Microsoft.SqlServer.Types;
+using SQLSpatialTools.Utility;
+using SQLSpatialTools.Sinks.Geometry;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Types.SQL
 {
 	[Serializable]
 	[SqlUserDefinedType(Format.UserDefined, IsByteOrdered = false, MaxByteSize = -1, IsFixedLength = false)]
 	public sealed class AffineTransform : INullable, IBinarySerialize
 	{
-		public double ax, bx, cx;
-		public double ay, by, cy;
+        private double _ax, _bx, _cx;
+        private double _ay, _by, _cy;
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
-		public static AffineTransform Translate(double dx, double dy)
+		public static AffineTransform Translate(double cx, double cy)
 		{
-			AffineTransform t = new AffineTransform();
-			t.ax = 1;
-			t.by = 1;
-			t.cx = dx;
-			t.cy = dy;
-			return t;
+            var transform = new AffineTransform {_ax = 1, _by = 1, _cx = cx, _cy = cy};
+            return transform;
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static AffineTransform Rotate(double angleDeg)
 		{
-			double angle = Util.ToRadians(angleDeg);
-			AffineTransform t = new AffineTransform();
-			t.ax = Math.Cos(angle);
-			t.ay = Math.Sin(angle);
-			t.bx = -t.ay;
-			t.by = t.ax;
-			return t;
+			var angle = SpatialUtil.ToRadians(angleDeg);
+            var transform = new AffineTransform {_ax = Math.Cos(angle), _ay = Math.Sin(angle)};
+            transform._bx = -transform._ay;
+			transform._by = transform._ax;
+			return transform;
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public static AffineTransform Scale(double sx, double sy)
 		{
-			AffineTransform t = new AffineTransform();
-			t.ax = sx;
-			t.by = sy;
-			return t;
+            var transform = new AffineTransform {_ax = sx, _by = sy};
+            return transform;
 		}
 
 		[SqlMethod(IsDeterministic = true, IsPrecise = false)]
 		public SqlGeometry Apply(SqlGeometry geometry)
 		{
-			SqlGeometryBuilder builder = new SqlGeometryBuilder();
+			var builder = new SqlGeometryBuilder();
 			geometry.Populate(new GeometryTransformer(builder, this));
 			return builder.ConstructedGeometry;
 		}
 
 		public double GetX(double x, double y)
 		{
-			return ax * x + bx * y + cx;
+			return _ax * x + _bx * y + _cx;
 		}
 
 		public double GetY(double x, double y)
 		{
-			return ay * x + by * y + cy;
+			return _ay * x + _by * y + _cy;
 		}
 
 		public void Read(BinaryReader r)
 		{
-			ax = r.ReadDouble();
-			bx = r.ReadDouble();
-			cx = r.ReadDouble();
-			ay = r.ReadDouble();
-			by = r.ReadDouble();
-			cy = r.ReadDouble();
+			_ax = r.ReadDouble();
+			_bx = r.ReadDouble();
+			_cx = r.ReadDouble();
+			_ay = r.ReadDouble();
+			_by = r.ReadDouble();
+			_cy = r.ReadDouble();
 		}
 
-		public void Write(BinaryWriter w)
+		public void Write(BinaryWriter binaryWriter)
 		{
-			w.Write(ax);
-			w.Write(bx);
-			w.Write(cx);
-			w.Write(ay);
-			w.Write(by);
-			w.Write(cy);
+			binaryWriter.Write(_ax);
+			binaryWriter.Write(_bx);
+			binaryWriter.Write(_cx);
+			binaryWriter.Write(_ay);
+			binaryWriter.Write(_by);
+			binaryWriter.Write(_cy);
 		}
 
-		public bool IsNull
-		{
-			get { return false; }
-		}
+		public bool IsNull => false;
 
-		public static AffineTransform Null
+        public static AffineTransform Null
 		{
 			[SqlMethod(IsDeterministic = true, IsPrecise = true)]
-			get
-			{
-				return null;
-			}
-		}
+			get => null;
+        }
 
         [SqlMethod(IsDeterministic = true, IsPrecise = false)]
         public static AffineTransform Parse(SqlString str)
         {
-            AffineTransform tranform = new AffineTransform();
+            var transform = new AffineTransform();
 
-            string[] args = str.ToString().Split(' ');
-            tranform.ax = Double.Parse(args[0]);
-            tranform.bx = Double.Parse(args[1]);
-            tranform.cx = Double.Parse(args[2]);
-			tranform.ay = Double.Parse(args[3]);
-			tranform.by = Double.Parse(args[4]);
-			tranform.cy = Double.Parse(args[5]);
+            var args = str.ToString().Split(' ');
+            transform._ax = double.Parse(args[0]);
+            transform._bx = double.Parse(args[1]);
+            transform._cx = double.Parse(args[2]);
+			transform._ay = double.Parse(args[3]);
+			transform._by = double.Parse(args[4]);
+			transform._cy = double.Parse(args[5]);
             
-            return tranform;
+            return transform;
         }
 
         [return: SqlFacet(MaxSize = -1)]
         [SqlMethod(IsDeterministic = true, IsPrecise = false)]
         public override string ToString()
         {
-            return ax + " " + bx + " " + cx + " " + ay + " " + by + " " + cy;
+            return _ax + " " + _bx + " " + _cx + " " + _ay + " " + _by + " " + _cy;
         }
 	}
 }

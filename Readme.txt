@@ -3,8 +3,9 @@
 ***********************************************************
 
 1: Introduction
-2: Installation
-3: Features
+2: Build\Signing
+3: Installation
+4: Features
 
 ***********************************************************
 ** 1: Introduction
@@ -24,12 +25,26 @@ http://www.github.com/Microsoft/SQLServerSpatialTools/blob/master/License.txt
 or the included License.txt file for details.
 
 ***********************************************************
-** 2: Installation
+** 2: Build\Signing
 ***********************************************************
+This package contains a core assembly SQLSpatialTools.dll which can be 
+included and used directly from a .NET application, or can be registered 
+and used from within SQL Server.
 
-This package contains a single assembly, SQLSpatialTools.dll
-This assembly can be included and used directly from a .NET 
-application, or can be registered and used from within SQL Server.
+Signing
+-------
+This dll is signed with Spatial.pfx file for security. So you need set the 
+password for the certificate before you can build from VS.
+
+Password for pfx:spatial@123
+
+To set password open project properties-> Signing tab->Sign the assembly(section) 
+Click the Certificate dropdown; you will be prompted with password text box; 
+where you need to enter the above password before build.
+
+***********************************************************
+** 3: Installation
+***********************************************************
 
 Scripts for registering and unregistering the functionality in
 SQL Server are included in the SQL Scripts directory.
@@ -52,7 +67,7 @@ To Unregister:
 2) Execute the script on your SQL Server instance.
 
 ***********************************************************
-** 3: Features
+** 4: Features
 ***********************************************************
 
 Scripts
@@ -168,3 +183,83 @@ additional buffer.
 GeometryEnvelopeAggregate
 This aggregate finds the envelope that contains a set of input
 geometries.
+
+LRS Functions
+-------------
+Linear referencing (also called linear reference system or linear referencing system or LRS), 
+is a method of spatial referencing in engineering and construction, in which the locations of 
+physical features along a linear element are described in terms of measurements from a fixed point, 
+such as a milestone along a road.
+
+ 1. LRS_ClipGeometrySegment
+     - Returns clipped geometry segment after clip operation.
+
+ 2. LRS_ConvertToLrsGeom
+     - Converts a standard Geometry line string to an LRS geometric segment by adding measure information.
+
+ 3. LRS_GetEndMeasure
+     - Returns the End Measure of a geometric segment.
+
+ 4.  LRS_GetMergePosition
+     - Checks if two input geometries are spatially connected. 
+       If connected returns the connected\merge position; else returns false.
+
+ 5. LRS_GetStartMeasure
+     - Returns the Start Measure of a geometric segment.
+
+ 6. LRS_InterpolateBetweenGeom
+     - Compute and get a new POINT with the specified measure between two input POINT of the geometric segment.
+
+ 7. LRS_IsConnected
+     - Checks if two input geometries are spatially connected.
+
+ 8. LRS_IsValidPoint
+     - Checks if a geometry segment is a valid POINT type or not.
+
+ 9. LRS_LocatePointAlongGeom
+     - Returns the POINT located at a specified measure from the start of a geometric segment.
+
+ 10. LRS_MergeGeometrySegment
+      - Returns the geometry object resulting from the concatenation of two geometric segments.
+
+ 11. LRS_MergeAndResetGeometrySegments
+      - Merges the input segments within tolerance and reset the measure of the resultant geometry segment.
+
+ 12. LRS_OffsetGeometrySegments
+      - Returns the geometric segment at a specified offset from a geometric segment.
+
+ 13. LRS_PopulateGeometryMeasures
+      - Populates the measures of all shape points based on the startMeasure and endMeasure of a geometric segment, 
+        overriding any previously assigned measures between the start point and end point.
+
+ 14. LRS_ResetMeasure
+      - Sets all measures of a geometric segment, including the start and end measures, to null values, 
+        overriding any previously assigned measures.
+
+ 15. LRS_ReverseLinearGeometry
+      - Returns a new geometric segment by reversing the measure values and the direction of the original geometric segment.
+
+ 16. LRS_ScaleGeometrySegment
+      - Returns a new geometric segment by scaling the original geometric segment 
+       (that is, redefining and shifting the measure values of all the points by the given shift measure).
+
+ 17. LRS_SplitGeometrySegment
+      - Splits a geometric segment into two geometric segments
+
+ 18. LRS_TranslateMeasure
+      - Returns a new geometric segment by translating the original geometric segment 
+       (that is, adding the measure values of all the points by the given translate measure).
+
+ 19. LRS_ValidateLRSGeometry
+      - Checks if the input LRS geometry is valid.
+ 
+Utility Functions
+-----------------
+  1. Util_PolygonToLine
+      - Converts all polygon-type elements in a geometry to line-type elements.
+
+  2. Util_RemoveDuplicateVertices
+      - Removes consecutive duplicate vertices and co linear points of the valid geometry bounds within the tolerance.
+
+  3. Util_Extract
+      - Returns the geometry specified by the element index and ring index.

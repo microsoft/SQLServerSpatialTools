@@ -2,6 +2,7 @@ bin/
 obj/
 *.zip
 .vs/
+..svnbridge/
 *.psess
 *.vspx
 *.suo

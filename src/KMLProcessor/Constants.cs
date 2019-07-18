@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
 
-namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
+namespace SQLSpatialTools.KMLProcessor
 {
-	public class Constants
+	public static class Constants
 	{
 		/// <summary>
 		/// SQL Server default SRID. SQL Server uses the default SRID of 4326, 
@@ -12,45 +12,21 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		///
 		/// Source: http://msdn.microsoft.com/en-us/library/bb964707.aspx
 		/// </summary>
-		public static int DefaultSRID
-		{
-			get
-			{
-				return 4326;
-			}
-		}
+		public static int DefaultSRID => 4326;
 
-		/// <summary>
+        /// <summary>
 		/// Google's KML extensions namespace
 		/// </summary>
-		public static string GxNamespace
-		{
-			get
-			{
-				return "http://www.google.com/kml/ext/2.2";
-			}
-		}
+		public static string GxNamespace => "http://www.google.com/kml/ext/2.2";
 
-		/// <summary>
+        /// <summary>
 		/// KML namespace
 		/// </summary>
-		public static string KmlNamespace
-		{
-			get
-			{
-				return "http://www.opengis.net/kml/2.2";
-			}
-		}
+		public static string KmlNamespace => "http://www.opengis.net/kml/2.2";
 
-		/// <summary>
+        /// <summary>
 		/// Atom namespace
 		/// </summary>
-		public static string AtomNamespace
-		{
-			get
-			{
-				return "http://www.w3.org/2005/Atom";
-			}
-		}
-	}
+		public static string AtomNamespace => "http://www.w3.org/2005/Atom";
+    }
 }

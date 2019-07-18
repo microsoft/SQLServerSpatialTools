@@ -1,219 +1,163 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
+
 using Microsoft.SqlServer.Types;
+using SQLSpatialTools.Utility;
 
-namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
+namespace SQLSpatialTools.KMLProcessor.Import
 {
-	/// <summary>
-	/// This class holds the information about a Point extracted from the KML file
-	/// </summary>
-	public class Point : Geography
-	{
-		#region Constructors
+#pragma warning disable CS0659 
+    // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+    /// <summary>
+    /// This class holds the information about a Point extracted from the KML file
+    /// </summary>
+    public class Point : Geography
+#pragma warning restore CS0659
+    {
+        #region Constructors
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		public Point()
-			: this(0, 0, null, null)
-		{
-		}
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public Point() : this(0, 0)
+        {
+        }
 
-		/// <summary>
-		/// Constructor. Constructs the point using the given longitude and latitude.
-		/// </summary>
-		/// <param name="longitude">Longitude</param>
-		/// <param name="latitude">Latitude</param>
-		public Point(double longitude, double latitude)
-			: this(longitude, latitude, null, null)
-		{
-		}
+        /// <summary>
+        /// Constructor. Constructs the point using the given longitude, latitude, altitude and measure.
+        /// </summary>
+        /// <param name="longitude">Longitude</param>
+        /// <param name="latitude">Latitude</param>
+        /// <param name="altitude">Altitude</param>
+        /// <param name="measure">Measure</param>
+        public Point(double longitude, double latitude, double? altitude = null, double? measure = null)
+        {
+            Longitude = longitude;
+            Latitude = latitude;
+            Altitude = altitude;
+            Measure = measure;
+        }
 
-		/// <summary>
-		/// Constructor. Constructs the point using the given longitude, latitude and altitude
-		/// </summary>
-		/// <param name="longitude">Longitude</param>
-		/// <param name="latitude">Latitude</param>
-		/// <param name="altitude">Altitude</param>
-		public Point(double longitude, double latitude, double? altitude)
-			: this(longitude, latitude, altitude, null)
-		{
-		}
+        #endregion
 
-		/// <summary>
-		/// Constructor. Constructs the point using the given longitude, latitude, altitude and measure.
-		/// </summary>
-		/// <param name="longitude">Longitude</param>
-		/// <param name="latitude">Latitude</param>
-		/// <param name="altitude">Altitude</param>
-		/// <param name="measure">Measure</param>
-		public Point(double longitude, double latitude, double? altitude, double? measure)
-		{
-			Longitude = longitude;
-			Latitude = latitude;
-			Altitude = altitude;
-			Measure = measure;
-		}
+        #region Public Properties
 
-		#endregion
+        /// <summary>
+        /// Longitude.
+        /// </summary>
+        public double Longitude { get; set; }
 
-		#region Public Properties
+        /// <summary>
+        /// Latitude.
+        /// </summary>
+        public double Latitude { get; set; }
 
-		/// <summary>
-		/// Longitude.
-		/// </summary>
-		public double Longitude
-		{
-			get { return m_Longitude; }
-			set
-			{
-				m_Longitude = value;
-			}
-		}
-		/// <summary>
-		/// Data member for the Longitude property
-		/// </summary>
-		protected double m_Longitude = 0;
+        /// <summary>
+        /// Altitude.
+        /// </summary>
+        public double? Altitude { get; set; }
 
-		/// <summary>
-		/// Latitude.
-		/// </summary>
-		public double Latitude
-		{
-			get { return m_Latitude; }
-			set
-			{
-				m_Latitude = value;
-			}
-		}
-		/// <summary>
-		/// Data member for the Latitude property
-		/// </summary>
-		protected double m_Latitude = 0;
+        /// <summary>
+        /// Measure
+        /// </summary>
+        public double? Measure { get; set; }
 
-		/// <summary>
-		/// Altitude.
-		/// </summary>
-		public double? Altitude
-		{
-			get { return m_Altitude; }
-			set
-			{
-				m_Altitude = value;
-			}
-		}
-		/// <summary>
-		/// Data member for the Altitude property
-		/// </summary>
-		protected double? m_Altitude = null;
+        /// <summary>
+        /// SqlGeography instance well-known text.
+        /// </summary>
+        public override string WKT
+        {
+            get
+            {
+                var wkt = $"POINT({Coordinate})";
 
-		/// <summary>
-		/// Measure
-		/// </summary>
-		public double? Measure
-		{
-			get { return m_Measure; }
-			set { m_Measure = value; }
-		}
-		/// <summary>
-		/// Data member for the Measure property
-		/// </summary>
-		protected double? m_Measure = null;
+                return wkt;
+            }
+        }
 
-		/// <summary>
-		/// SqlGeography instance well-known text.
-		/// </summary>
-		public override string WKT
-		{
-			get
-			{
-				string wkt = String.Format("POINT({0})", Coordinate);
+        /// <summary>
+        /// Point's coordinate in the format: longitude, latitude [, altitude]
+        /// </summary>
+        public string Coordinate
+        {
+            get
+            {
+                var wkt = $"{Longitude} {Latitude}";
 
-				return wkt;
-			}
-		}
+                if (Altitude.HasValue)
+                    wkt += " " + Altitude.Value;
 
-		/// <summary>
-		/// Point's coordinate in the format: longitude, latitude [, altitude]
-		/// </summary>
-		public string Coordinate
-		{
-			get
-			{
-				string wkt = String.Format("{0} {1}", m_Longitude, m_Latitude);
+                if (Measure.HasValue)
+                    wkt += " " + Measure.Value;
 
-				if (m_Altitude.HasValue)
-					wkt += " " + m_Altitude.Value;
+                return wkt;
+            }
+        }
 
-				if (m_Measure.HasValue)
-					wkt += " " + m_Measure.Value;
+        #endregion
 
-				return wkt;
-			}
-		}
+        #region Geography methods
 
-		#endregion
+        /// <summary>
+        /// This method populates the given sink with the data about this geography instance
+        /// </summary>
+        /// <param name="sink">Sink to be populated</param>
+        public override void Populate(IGeographySink110 sink)
+        {
+            sink.BeginGeography(OpenGisGeographyType.Point);
+            sink.BeginFigure(Latitude, Longitude, Altitude, Measure);
 
-		#region Geography methods
+            sink.EndFigure();
+            sink.EndGeography();
+        }
 
-		/// <summary>
-		/// This method populates the given sink with the data about this geography instance
-		/// </summary>
-		/// <param name="sink">Sink to be populated</param>
-		public override void Populate(IGeographySink110 sink)
-		{
-			sink.BeginGeography(OpenGisGeographyType.Point);
-			sink.BeginFigure(Latitude, Longitude, Altitude, Measure);
+        #endregion
 
-			sink.EndFigure();
-			sink.EndGeography();
-		}
+        #region Public Methods
 
-		#endregion
+        /// <summary>
+        /// This method clones this point
+        /// </summary>
+        /// <returns>Clone of this point</returns>
+        public Point Clone()
+        {
+            return new Point
+            {
+                Longitude = Longitude,
+                Latitude = Latitude,
+                Altitude = Altitude,
+                Measure = Measure
+            };
+        }
 
-		#region Public Methods
+        #endregion
 
-		/// <summary>
-		/// This method clones this point
-		/// </summary>
-		/// <returns>Clone of this point</returns>
-		public Point Clone()
-		{
-			Point c = new Point();
+        #region Overridden Base Methods
 
-			c.Longitude = Longitude;
-			c.Latitude = Latitude;
-			c.Altitude = Altitude;
-			c.Measure = Measure;
+        /// <summary>
+        /// This method compares the given object with this point
+        /// </summary>
+        /// <param name="obj">Object to be compared with this point</param>
+        /// <returns></returns>
+#pragma warning disable 659
+        public override bool Equals(object obj)
+#pragma warning restore 659
+        {
+            if (this == obj)
+                return true;
 
-			return c;
-		}
+            if (!(obj is Point rhs))
+                return false;
 
-		#endregion
+            return Longitude.EqualsTo(rhs.Longitude) &&
+                   Latitude.EqualsTo(rhs.Latitude) &&
+                   // ReSharper disable PossibleInvalidOperationException
+                   (Altitude == null && rhs.Altitude == null || Altitude.Value.EqualsTo(rhs.Altitude.Value)) &&
+                   (Measure == null && rhs.Measure == null || (Measure.Value.EqualsTo(rhs.Measure.Value)));
+                   // ReSharper restore PossibleInvalidOperationException
+        }
 
-		#region Overriden Base Methods
-
-		/// <summary>
-		/// This method compares the given object with this point
-		/// </summary>
-		/// <param name="obj">Object to be compared with this point</param>
-		/// <returns></returns>
-		public override bool Equals(object obj)
-		{
-			if (this == obj)
-				return true;
-
-			Point rhs = obj as Point;
-			if (rhs == null)
-				return false;
-
-			return (m_Longitude == rhs.m_Longitude &&
-					m_Latitude == rhs.m_Latitude &&
-					((m_Altitude == null && rhs.m_Altitude == null) || (m_Altitude.Value == rhs.m_Altitude.Value)) &&
-					((m_Measure == null && rhs.m_Measure == null) || (m_Measure.Value == rhs.m_Measure.Value)));
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }

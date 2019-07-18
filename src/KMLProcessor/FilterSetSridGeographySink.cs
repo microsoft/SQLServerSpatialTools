@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
+
+using System;
 using Microsoft.SqlServer.Types;
 
-namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
+namespace SQLSpatialTools.KMLProcessor
 {
 	/// <summary>
 	/// This class will propagate all method calls to the given target sink, 
@@ -20,7 +21,7 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// <param name="targetSink">Target sink</param>
 		public FilterSetSridGeographySink(IGeographySink110 targetSink)
 		{
-			m_TargetSink = targetSink;
+			_targetSink = targetSink;
 		}
 
 		#endregion
@@ -30,17 +31,16 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
 		/// <summary>
 		/// Target sink to propagate all method calls to it, except the method call to the SetSrid method
 		/// </summary>
-		private IGeographySink110 m_TargetSink;
+		private readonly IGeographySink110 _targetSink;
 
 		#endregion
 
 		#region IGeographySink Members
 
 		public void AddLine(double latitude, double longitude, double? z, double? m)
-		{
-			if (m_TargetSink != null)
-				m_TargetSink.AddLine(latitude, longitude, z, m);
-		}
+        {
+            _targetSink?.AddLine(latitude, longitude, z, m);
+        }
 
         public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
         {
@@ -48,28 +48,24 @@ namespace Microsoft.SqlServer.SpatialToolbox.KMLProcessor
         }
 
         public void BeginFigure(double latitude, double longitude, double? z, double? m)
-		{
-			if (m_TargetSink != null)
-				m_TargetSink.BeginFigure(latitude, longitude, z, m);
-		}
+        {
+            _targetSink?.BeginFigure(latitude, longitude, z, m);
+        }
 
 		public void BeginGeography(OpenGisGeographyType type)
-		{
-			if (m_TargetSink != null)
-				m_TargetSink.BeginGeography(type);
-		}
+        {
+            _targetSink?.BeginGeography(type);
+        }
 
 		public void EndFigure()
-		{
-			if (m_TargetSink != null)
-				m_TargetSink.EndFigure();
-		}
+        {
+            _targetSink?.EndFigure();
+        }
 
 		public void EndGeography()
-		{
-			if (m_TargetSink != null)
-				m_TargetSink.EndGeography();
-		}
+        {
+            _targetSink?.EndGeography();
+        }
 
 		/// <summary>
 		/// This method call will not be propagated to the target sink

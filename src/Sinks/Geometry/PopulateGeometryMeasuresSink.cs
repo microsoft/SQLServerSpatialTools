@@ -1,67 +1,92 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿//------------------------------------------------------------------------------
+// Copyright (c) 2019 Microsoft Corporation. All rights reserved.
+//------------------------------------------------------------------------------
 
-using Microsoft.SqlServer.Types;
 using System;
+using Microsoft.SqlServer.Types;
+using SQLSpatialTools.Types;
 
-namespace SQLSpatialTools
+namespace SQLSpatialTools.Sinks.Geometry
 {
-    /**
-     * This class implements a geometry sink that finds a point along a geography linestring instance and pipes
-     * it to another sink.
-     */
-    class PopulateGeometryMeasuresSink : IGeometrySink110
+    /// <summary>
+    /// This class implements a geometry sink that populate measures for each point in a geometry .
+    /// </summary>
+    internal class PopulateGeometryMeasuresSink : IGeometrySink110
     {
-        SqlGeometry _lastPoint;
-        SqlGeometry _thisPoint;
-        double _startMeasure;
-        double _endMeasure;
-        double _totalLength;
-        double _currentLength = 0;
-        int _srid;                     // The _srid we are working in.
-        SqlGeometryBuilder _target;    // Where we place our result.
+        private SqlGeometry _lastPoint;
+        private SqlGeometry _thisPoint;
+
+        private LRSMultiLine _lines;
+        private LRSLine _currentLine;
+
+        private readonly double _startMeasure;
+        private readonly double _endMeasure;
+        private readonly double _totalLength;
+
+        private bool _isMultiLine;
+        private int _lineCounter;
+        private int _srid;                     // The _srid we are working in.
+        private double _currentLength;
+        private double _currentPointM;
+        private SqlGeometry _target;    // Where we place our result.
+
+        /// <summary>
+        /// Gets the constructed geometry.
+        /// </summary>
+        /// <returns></returns>
+        public SqlGeometry GetConstructedGeom()
+        {
+            return _target;
+        }
 
         // We target another builder, to which we will send a point representing the point we find.
         // We also take a distance, which is the point along the input linestring we will travel.
         // Note that we only operate on LineString instances: anything else will throw an exception.
-        public PopulateGeometryMeasuresSink(double startMeasure, double endMeasure, double length, SqlGeometryBuilder target)
+        public PopulateGeometryMeasuresSink(double startMeasure, double endMeasure, double length)
         {
-            _target = target;
             _startMeasure = startMeasure;
             _endMeasure = endMeasure;
             _totalLength = length;
+            _isMultiLine = false;
+            _lineCounter = 0;
+            _currentPointM = startMeasure;
         }
 
-        // Save the SRID for later
+        // Initialize MultiLine and sets srid.
         public void SetSrid(int srid)
         {
+            _lines = new LRSMultiLine(srid);
             _srid = srid;
         }
 
-        // Start the geometry.  Throw if it isn't a LineString.
+        // Start geometry and check if the type is of the supported types
         public void BeginGeometry(OpenGisGeometryType type)
         {
-            if (type != OpenGisGeometryType.LineString)
-                throw new ArgumentException("This operation may only be executed on LineString instances.");
-            _target.SetSrid(_srid);
-            _target.BeginGeometry(OpenGisGeometryType.LineString);
+            if (type == OpenGisGeometryType.MultiLineString)
+                _isMultiLine = true;
+            else if (type == OpenGisGeometryType.LineString)
+                _lineCounter++;
         }
 
-        // Start the figure.  Note that since we only operate on LineStrings, this should only be executed
-        // once.
-        public void BeginFigure(double latitude, double longitude, double? z, double? m)
+
+        // This operates on LineStrings, multi linestring
+        public void BeginFigure(double x, double y, double? z, double? m)
         {
+            _currentLine = new LRSLine(_srid);
+            _currentLine.AddPoint(x, y, null, _currentPointM);
+
             // Memorize the starting point.
-            _target.BeginFigure(latitude, longitude, null, _startMeasure);
-            _lastPoint = SqlGeometry.Point(latitude, longitude, _srid);
+            _lastPoint = SqlGeometry.Point(x, y, _srid);
         }
 
         // This is where the real work is done.
-        public void AddLine(double latitude, double longitude, double? z, double? m)
+        public void AddLine(double x, double y, double? z, double? m)
         {
-            _thisPoint = SqlGeometry.Point(latitude, longitude, _srid);
+            _thisPoint = SqlGeometry.Point(x, y, _srid);
             _currentLength += _lastPoint.STDistance(_thisPoint).Value;
-            double currentM = _startMeasure + (_currentLength / _totalLength) * (_endMeasure - _startMeasure);
-            _target.AddLine(latitude, longitude, null, currentM);
+            _currentLine.AddPoint(x, y, null, GetCurrentMeasure());
+
+            // reset the last point with the current point.
             _lastPoint = _thisPoint;
         }
 
@@ -73,15 +98,34 @@ namespace SQLSpatialTools
         // This is a NOP.
         public void EndFigure()
         {
-            _target.EndFigure();
+            
         }
 
         // When we end, we'll make all of our output calls to our target.
-        // Here's also where we catch whether we've run off the end of our LineString.
         public void EndGeometry()
         {
-            _target.EndGeometry();
+            // if not multi line then add the current line to the collection.
+            if (!_isMultiLine)
+                _lines.AddLine(_currentLine);
+
+            // if line counter is 0 then it is multiline
+            // if 1 then it is linestring 
+            if (_lineCounter == 0 || !_isMultiLine)
+            {
+                _target = _lines.ToSqlGeometry();
+            }
+            else
+            {
+                _lines.AddLine(_currentLine);
+                // reset the line counter so that the child line strings chaining is done and return to base multiline type
+                _lineCounter--;
+            }
         }
 
+        private double GetCurrentMeasure()
+        {
+            _currentPointM = _startMeasure + (_currentLength / _totalLength) * (_endMeasure - _startMeasure);
+            return _currentPointM;
+        }
     }
 }
