@@ -1,3 +1,70 @@
+# SQLServerSpatialTools for dotnet core
+
+A very quick fork that modifies the `.csproj` project file to compile under dotnet core 9 on macos, removes the `pfx` code signing bits (which presumably are unsupported - anyone with more time, please feel free to investigate!), and removes the `LRS` code that breaks the build.
+
+## Compilation
+
+```shell
+git checkout https://github.com/tbbuck/SQLServerSpatialTools-DotnetCore
+cd SQLServerSpatialTools-DotnetCore/src
+dotnet build
+```
+
+The resulting `.dll` will be found at `SQLServerSpatialTools-DotnetCore/output/lib/net481/SQLSpatialTools.dll`
+
+## Installation
+
+### System
+```shell
+# copy the file to your MSSQL server however you fancy, and put in an MSSQL-accessible directory, for example:
+scp SQLServerSpatialTools-DotnetCore/output/lib/net481/SQLSpatialTools.dll MyFancySqlServer:/tmp
+sudo mkdir /opt/mssql-clr/SQLServerSpatialTools-DotnetCore
+sudo mv /tmp/SQLServerSpatialTools.dll /opt/mssql-clr/SQLServerSpatialTools-DotnetCore
+sudo chown mssql:mssql -R /opt/mssql-clr/SQLServerSpatialTools-DotnetCore
+```
+
+### SQL Server
+
+(basically - follow the instructions in `src/SQL Scripts/Register.sql`:
+
+```sql
+-- These first few instructions may not be necessary if you've set up CLRs pbefore
+-- Copyright (c) Microsoft Corporation.  All rights reserved.
+-- Install the SQLSpatialTools assembly and all its functions into the current database
+
+-- Enabling CLR prior to registering assembly and its related functions.
+EXEC sp_configure 'show advanced option', '1';
+RECONFIGURE;
+Go
+
+sp_configure 'clr enabled', 1  ;
+GO
+RECONFIGURE  ;
+GO
+
+EXEC sp_configure 'clr strict security',  '0'
+RECONFIGURE WITH OVERRIDE;
+GO
+
+-- This is the big important one
+CREATE assembly SQLSpatialTools
+FROM '/opt/mssql-clr/SQLServerSpatialTools-DotnetCore/SQLSpatialTools.dll'
+GO
+
+--- run the rest of the commands from the Register script, such as:
+
+CREATE FUNCTION IsValidGeographyFromText (
+    @inputWKT NVARCHAR(MAX)
+    ,@srid INT
+    )
+RETURNS BIT
+AS
+EXTERNAL NAME SQLSpatialTools.[SQLSpatialTools.Functions.General.Geography].IsValidGeographyFromText
+GO
+
+
+```
+
 ***********************************************************
 ** 0: Contents
 ***********************************************************
