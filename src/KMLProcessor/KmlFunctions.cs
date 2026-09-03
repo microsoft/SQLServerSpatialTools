@@ -5,8 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.IO;
 using System.Xml;
@@ -176,112 +174,5 @@ namespace SQLSpatialTools.KMLProcessor
         #endregion
 
         #endregion
-
-        #region Protected Methods
-
-        /// <summary>
-        /// This method stores the given box into the database
-        /// </summary>
-        /// <param name="box">Box to be saved</param>
-        /// <param name="insertedKmlId">The KmlId to connect this object to</param>
-        /// <param name="con">Sql connection</param>
-        /// <param name="tran">Sql transaction</param>
-        /// <returns>The database id which is assigned to the given box</returns>
-        protected static int? SaveLatLonBox(Geography box, int insertedKmlId, SqlConnection con, SqlTransaction tran)
-        {
-            #region Insert Geography
-
-            int? insertedGeographyId = null;
-
-            if (box != null)
-            {
-                var saveGeographyCmd =
-                    new SqlCommand(
-                        " insert into Geographies(Geography, KmlId) " +
-                        " values(geography::Parse('" + box + "'), @KmlId);select scope_identity()", con, tran);
-
-                AddParameter(saveGeographyCmd, "KmlId", insertedKmlId, DbType.Int32);
-
-                insertedGeographyId = (int)((decimal)saveGeographyCmd.ExecuteScalar());
-                box.DbId = insertedGeographyId;
-            }
-
-            #endregion
-
-            #region Insert Lat Lon Box
-
-            var saveLatLonBox =
-                new SqlCommand(
-                    " insert into LatLonBoxes(BoxType, GeographyId, rotation, MinAlt, MaxAlt, AltitudeMode) " +
-                    " values(@BoxType, @GeographyId, @rotation, @MinAlt, @MaxAlt, @AltitudeMode);select scope_identity()",
-                    con, tran);
-
-            AddParameter(saveLatLonBox, "GeographyId", insertedGeographyId, DbType.Int32);
-
-            var boxType = "";
-
-            if (box is LatLonBox latLonBox)
-            {
-                boxType = "LatLonBox";
-                AddParameter(saveLatLonBox, "rotation", latLonBox.Rotation, DbType.Double);
-            }
-            else
-            {
-                AddParameter(saveLatLonBox, "rotation", null, DbType.Double);
-            }
-
-            if (box is LatLonAltBox latLonAltBox)
-            {
-                boxType = "LatLonAltBox";
-
-                AddParameter(saveLatLonBox, "MinAlt", latLonAltBox.MinAltitude, DbType.Double);
-                AddParameter(saveLatLonBox, "MaxAlt", latLonAltBox.MaxAltitude, DbType.Double);
-                AddParameter(saveLatLonBox, "AltitudeMode", latLonAltBox.AltitudeMode.ToString(), DbType.String);
-            }
-            else
-            {
-                AddParameter(saveLatLonBox, "MinAlt", null, DbType.Double);
-                AddParameter(saveLatLonBox, "MaxAlt", null, DbType.Double);
-                AddParameter(saveLatLonBox, "AltitudeMode", null, DbType.Double);
-            }
-
-            // ReSharper disable once UnusedVariable
-            if (box is LatLonQuad latLonQuad)
-            {
-                boxType = "LatLonQuad";
-            }
-
-            AddParameter(saveLatLonBox, "BoxType", boxType, DbType.String);
-
-            int? insertedLatLonBox = (int)((decimal)saveLatLonBox.ExecuteScalar());
-
-            #endregion
-
-            return insertedLatLonBox;
-        }
-
-        /// <summary>
-        /// This method adds a new parameter to the given sql command
-        /// </summary>
-        /// <param name="cmd">Command to add parameter to</param>
-        /// <param name="parameterName">Parameter name</param>
-        /// <param name="value">Parameter value</param>
-        /// <param name="type">Parameter database type</param>
-        protected static void AddParameter(SqlCommand cmd, string parameterName, object value, DbType type)
-        {
-            if (value == null)
-                value = DBNull.Value;
-
-            cmd.Parameters.Add(new SqlParameter()
-            {
-                ParameterName = parameterName,
-                Value = value,
-                DbType = type
-            });
-        }
-
-        #endregion
     }
 }
-
-

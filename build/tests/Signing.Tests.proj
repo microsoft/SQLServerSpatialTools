@@ -1,0 +1,159 @@
+<Project DefaultTargets="Test">
+  <Import Project="..\..\Directory.Build.props" />
+  <Import Project="..\Signing.tasks" />
+  <PropertyGroup>
+    <_TestDirectory>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)', 'obj', 'signing-tests'))</_TestDirectory>
+    <_FixtureProject>$(MSBuildThisFileDirectory)SigningFixture.csproj</_FixtureProject>
+    <_DevelopmentKey>$([System.IO.Path]::Combine('$(_TestDirectory)', 'development.snk'))</_DevelopmentKey>
+    <_ProductionKey>$([System.IO.Path]::Combine('$(_TestDirectory)', 'production.snk'))</_ProductionKey>
+    <_MissingKey>$([System.IO.Path]::Combine('$(_TestDirectory)', 'missing.snk'))</_MissingKey>
+    <_InvalidKey>$([System.IO.Path]::Combine('$(_TestDirectory)', 'invalid.snk'))</_InvalidKey>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_UnsignedFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=None;SqlClrSigningKeyFile=$(_MissingKey);SigningFixtureOutputPath=$(_TestDirectory)\unsigned\;BaseIntermediateOutputPath=$(_TestDirectory)\unsigned-obj\</AdditionalProperties>
+    </_UnsignedFixture>
+    <_ConcurrentFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=Development;SqlClrSigningDirectory=$(_TestDirectory);SigningFixtureOutputPath=$(_TestDirectory)\development\;BaseIntermediateOutputPath=$(_TestDirectory)\development-obj\</AdditionalProperties>
+    </_ConcurrentFixture>
+    <_ConcurrentFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=Development;SqlClrSigningDirectory=$(_TestDirectory);SigningFixtureOutputPath=$(_TestDirectory)\concurrent\;BaseIntermediateOutputPath=$(_TestDirectory)\concurrent-obj\</AdditionalProperties>
+    </_ConcurrentFixture>
+    <_ProductionFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=Production;SqlClrSigningDirectory=$(_TestDirectory);SigningFixtureOutputPath=$(_TestDirectory)\production\;BaseIntermediateOutputPath=$(_TestDirectory)\production-obj\</AdditionalProperties>
+    </_ProductionFixture>
+    <_ModernDevelopmentFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net10.0;SqlClrSigningMode=Development;SqlClrSigningKeyFile=$(_MissingKey);SigningFixtureOutputPath=$(_TestDirectory)\modern-development\;BaseIntermediateOutputPath=$(_TestDirectory)\modern-development-obj\</AdditionalProperties>
+    </_ModernDevelopmentFixture>
+    <_ModernProductionFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net10.0;SqlClrSigningMode=Production;SqlClrSigningKeyFile=$(_MissingKey);SigningFixtureOutputPath=$(_TestDirectory)\modern-production\;BaseIntermediateOutputPath=$(_TestDirectory)\modern-production-obj\</AdditionalProperties>
+    </_ModernProductionFixture>
+    <_DualTargetFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>SqlClrSigningMode=Development;SqlClrSigningDirectory=$(_TestDirectory);SigningFixtureOutputPath=$(_TestDirectory)\dual\;BaseIntermediateOutputPath=$(_TestDirectory)\dual-obj\</AdditionalProperties>
+    </_DualTargetFixture>
+    <_ToggleUnsignedFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=None;SigningFixtureFriendAccess=false;SqlClrSigningKeyFile=$(_DevelopmentKey);SigningFixtureOutputPath=$(_TestDirectory)\toggle\;BaseIntermediateOutputPath=$(_TestDirectory)\toggle-obj\</AdditionalProperties>
+    </_ToggleUnsignedFixture>
+    <_ToggleSignedFixture Include="$(_FixtureProject)">
+      <AdditionalProperties>TargetFramework=net472;SqlClrSigningMode=Development;SigningFixtureFriendAccess=false;SqlClrSigningKeyFile=$(_DevelopmentKey);SigningFixtureOutputPath=$(_TestDirectory)\toggle\;BaseIntermediateOutputPath=$(_TestDirectory)\toggle-obj\</AdditionalProperties>
+    </_ToggleSignedFixture>
+    <_SigningFixtures Include="@(_UnsignedFixture);@(_ConcurrentFixture);@(_ProductionFixture);@(_ModernDevelopmentFixture);@(_ModernProductionFixture);@(_DualTargetFixture);@(_ToggleUnsignedFixture)" />
+  </ItemGroup>
+
+  <UsingTask TaskName="VerifySigningFixture"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <AssemblyPath Required="true" />
+      <FriendAttributePath />
+      <ExpectedPublicKey />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Reflection" />
+      <Code Type="Method" Language="cs"><![CDATA[
+      public override bool Execute()
+      {
+        var key = AssemblyName.GetAssemblyName(AssemblyPath).GetPublicKey();
+        var actual = key == null ? "" : BitConverter.ToString(key).Replace("-", "").ToLowerInvariant();
+        if (actual != (ExpectedPublicKey ?? ""))
+            Log.LogError("Fixture assembly signing does not match the expected key.");
+        if (!string.IsNullOrEmpty(FriendAttributePath))
+        {
+            var attributes = File.ReadAllText(FriendAttributePath);
+            var friend = "SigningFixture.Friend" + (string.IsNullOrEmpty(ExpectedPublicKey) ? "" : ", PublicKey=" + ExpectedPublicKey);
+            if (!attributes.Contains("\"" + friend + "\""))
+                Log.LogError("Fixture friend access does not match its signing mode.");
+        }
+        return !Log.HasLoggedErrors;
+      }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="RestoreFixtures">
+    <MSBuild Projects="@(_SigningFixtures)" Targets="Restore" BuildInParallel="true"
+             Properties="SigningTestPhase=Restore" />
+  </Target>
+
+  <Target Name="Test" DependsOnTargets="RestoreFixtures">
+    <MakeDir Directories="$(_TestDirectory)" />
+    <Delete Files="$(_DevelopmentKey);$(_ProductionKey);$(_MissingKey);$(_InvalidKey)" />
+
+    <MSBuild Projects="@(_UnsignedFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'unsigned', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'unsigned-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))" />
+    <Error Condition="Exists('$(_MissingKey)')" Text="Unsigned builds must not generate keys." />
+
+    <MSBuild Projects="@(_ConcurrentFixture)" Targets="Build" BuildInParallel="true" />
+    <SqlClrSigningKey KeyFile="$(_DevelopmentKey)">
+      <Output TaskParameter="PublicKey" PropertyName="_DevelopmentPublicKey" />
+    </SqlClrSigningKey>
+    <GetFileHash Files="$(_DevelopmentKey)">
+      <Output TaskParameter="Items" ItemName="_OriginalKeyHash" />
+    </GetFileHash>
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'development', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'development-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'concurrent', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'concurrent-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+    <MSBuild Projects="$(_FixtureProject)" Targets="Rebuild"
+             Properties="TargetFramework=net472;SqlClrSigningMode=development;SqlClrSigningKeyFile=$(_DevelopmentKey);SigningFixtureOutputPath=$(_TestDirectory)\development\;BaseIntermediateOutputPath=$(_TestDirectory)\development-obj\;SigningTestInvocation=Rebuild" />
+    <GetFileHash Files="$(_DevelopmentKey)">
+      <Output TaskParameter="Items" ItemName="_RebuiltKeyHash" />
+    </GetFileHash>
+    <Error Condition="'@(_OriginalKeyHash->'%(FileHash)')' != '@(_RebuiltKeyHash->'%(FileHash)')'"
+           Text="Rebuild must preserve the development signing key." />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'development', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'development-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+
+    <Copy SourceFiles="$(_DevelopmentKey)" DestinationFiles="$(_ProductionKey)" />
+    <MSBuild Projects="@(_ProductionFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'production', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'production-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+
+    <SqlClrSigningKey KeyFile="$(_MissingKey)" CreateIfMissing="false" ContinueOnError="WarnAndContinue" />
+    <Error Condition="'$(MSBuildLastTaskResult)' != 'false' or Exists('$(_MissingKey)')"
+           Text="Production must fail without a key and must not generate one." />
+
+    <WriteLinesToFile File="$(_InvalidKey)" Lines="not a signing key" Overwrite="true" />
+    <SqlClrSigningKey KeyFile="$(_InvalidKey)" CreateIfMissing="true" ContinueOnError="WarnAndContinue" />
+    <Error Condition="'$(MSBuildLastTaskResult)' != 'false'"
+           Text="Development must reject an existing invalid key, not replace it." />
+    <ReadLinesFromFile File="$(_InvalidKey)">
+      <Output TaskParameter="Lines" ItemName="_InvalidKeyContents" />
+    </ReadLinesFromFile>
+    <Error Condition="'@(_InvalidKeyContents)' != 'not a signing key'"
+           Text="Development replaced an existing invalid key." />
+
+    <MSBuild Projects="@(_ModernDevelopmentFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'modern-development', 'net10.0', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'modern-development-obj', 'Debug', 'net10.0', 'SqlClrFriendAssemblies.g.cs'))" />
+    <MSBuild Projects="@(_ModernProductionFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'modern-production', 'net10.0', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'modern-production-obj', 'Debug', 'net10.0', 'SqlClrFriendAssemblies.g.cs'))" />
+    <Error Condition="Exists('$(_MissingKey)')" Text="Modern .NET builds must not generate signing keys." />
+
+    <MSBuild Projects="@(_DualTargetFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'dual', 'net472', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'dual-obj', 'Debug', 'net472', 'SqlClrFriendAssemblies.g.cs'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'dual', 'net10.0', 'SigningFixture.dll'))"
+                          FriendAttributePath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'dual-obj', 'Debug', 'net10.0', 'SqlClrFriendAssemblies.g.cs'))" />
+
+    <MSBuild Projects="@(_ToggleUnsignedFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'toggle', 'net472', 'SigningFixture.dll'))" />
+    <MSBuild Projects="@(_ToggleSignedFixture)" Targets="Build" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'toggle', 'net472', 'SigningFixture.dll'))"
+                          ExpectedPublicKey="$(_DevelopmentPublicKey)" />
+    <MSBuild Projects="@(_ToggleUnsignedFixture)" Targets="Build" Properties="SigningTestInvocation=ReturnToUnsigned" />
+    <VerifySigningFixture AssemblyPath="$([MSBuild]::NormalizePath('$(_TestDirectory)', 'toggle', 'net472', 'SigningFixture.dll'))" />
+    <Delete Files="$(_DevelopmentKey);$(_ProductionKey);$(_InvalidKey)" />
+    <Message Importance="high" Text="Signing regression checks passed. The two rejected-key build warnings above are expected." />
+  </Target>
+</Project>

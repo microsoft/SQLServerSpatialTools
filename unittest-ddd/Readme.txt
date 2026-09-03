@@ -19,6 +19,23 @@ It also publishes the obtained results and error info (on execution failures) to
 Added initial to compare the test results against Oracle DB.
 
 ********************
+*** Running Tests ***
+********************
+The entire DDD integration suite is skipped by default, before database setup.
+To opt in from the repository root:
+
+  dotnet test unittest-ddd\SQLSpatialTools.UnitTests.DDD.csproj -p:RunDDDTests=true
+
+Use only a configured, isolated Windows test environment with SQL Compact and
+Oracle/SQL Server connections. Tests create local data, modify databases, and
+can unregister SQL CLR assemblies. Never point them at production databases.
+
+The MSBuild flag selects DDD.runsettings unless custom runsettings are supplied.
+In Visual Studio, select this file explicitly to opt in. Custom runsettings must
+include <TestRunParameters><Parameter name="RunDDDTests" value="true" /></TestRunParameters>.
+Without that test-run parameter, direct DLL runs also report the suite as skipped.
+
+********************
 ***   Dev Notes  ***
 ********************
 To add a new function to this framework;

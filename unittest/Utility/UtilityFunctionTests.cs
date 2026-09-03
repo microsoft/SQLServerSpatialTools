@@ -33,7 +33,7 @@ namespace SQLSpatialTools.UnitTests.Utility
             geom = "POINT (1 1 1 1)".GetGeom();
             Assert.AreEqual(DimensionalInfo.Dim3DWithMeasure, geom.STGetDimension());
 
-            Assert.AreEqual(DimensionalInfo.Dim2D.GetString(), "2 Dimensional point, with x and y");
+            Assert.AreEqual("2 Dimensional point, with x and y", DimensionalInfo.Dim2D.GetString());
         }
 
         [TestMethod]
@@ -151,7 +151,7 @@ namespace SQLSpatialTools.UnitTests.Utility
             var point1 = new LRSPoint("LINESTRING EMPTY".GetGeom());
             var hashCode = point1.GetHashCode();
             Assert.IsTrue(hashCode > 0);
-            Assert.AreEqual(point1.ToString(), "POINT (0 0 )");
+            Assert.AreEqual("POINT (0 0 )", point1.ToString());
 
             // LRS Point Equality check
             point1 = new LRSPoint("POINT(1 1 0 1)".GetGeom());
@@ -167,10 +167,10 @@ namespace SQLSpatialTools.UnitTests.Utility
             var lrsPoints = new List<LRSPoint> {point1, point2, point3};
 
             // next and previous point
-            Assert.AreEqual(LRSPoint.GetNextPoint(ref lrsPoints, point2), point3);
-            Assert.AreEqual(LRSPoint.GetNextPoint(ref lrsPoints, point4), null);
-            Assert.AreEqual(LRSPoint.GetPreviousPoint(ref lrsPoints, point2), point1);
-            Assert.AreEqual(LRSPoint.GetPreviousPoint(ref lrsPoints, point4), null);
+            Assert.AreEqual(point3, LRSPoint.GetNextPoint(ref lrsPoints, point2));
+            Assert.AreEqual(null, LRSPoint.GetNextPoint(ref lrsPoints, point4));
+            Assert.AreEqual(point1, LRSPoint.GetPreviousPoint(ref lrsPoints, point2));
+            Assert.AreEqual(null, LRSPoint.GetPreviousPoint(ref lrsPoints, point4));
 
             // Multiline
             var lrs = new LRSMultiLine(4326);
@@ -192,11 +192,11 @@ namespace SQLSpatialTools.UnitTests.Utility
             var lrsLine1 = new LRSLine(4326);
             var wkt = lrs.ToString();
             Assert.AreEqual("MULTILINESTRING EMPTY", wkt);
-            Assert.AreEqual(lrs.GetPointAtM(10), null);
+            Assert.AreEqual(null, lrs.GetPointAtM(10));
 
             var pt = new LRSPoint(1, 1, 0, 1, 4326);
             lrsLine1.AddPoint(pt);
-            Assert.AreEqual(lrsLine1.ToString(), "POINT (1 1 1)");
+            Assert.AreEqual("POINT (1 1 1)", lrsLine1.ToString());
 
             pt = new LRSPoint(2, 2, 0, 2, 4326);
             lrsLine1.AddPoint(pt);
@@ -210,7 +210,7 @@ namespace SQLSpatialTools.UnitTests.Utility
             var lrsLine2 = new LRSLine(4326);
 
             pt = new LRSPoint(3, 3, 0, 3, 4326);
-            Assert.AreEqual(pt.ToString(), "POINT (3 3 3)");
+            Assert.AreEqual("POINT (3 3 3)", pt.ToString());
             lrsLine2.AddPoint(pt);
             pt = new LRSPoint(4, 4, 0, 4, 4326);
             lrsLine2.AddPoint(pt);
@@ -221,13 +221,13 @@ namespace SQLSpatialTools.UnitTests.Utility
             geomBuilder = null;
             lrs.BuildSqlGeometry(ref geomBuilder);
 
-            Assert.AreEqual(lrs.GetPointAtM(10), null);
-            Assert.AreEqual(lrs.GetPointAtM(2), new LRSPoint(2, 2, 0, 2, 4326));
+            Assert.AreEqual(null, lrs.GetPointAtM(10));
+            Assert.AreEqual(new LRSPoint(2, 2, 0, 2, 4326), lrs.GetPointAtM(2));
             wkt = lrs.ToString();
             lrs.RemoveFirst();
-            Assert.AreEqual(lrs.Count, 1);
+            Assert.AreEqual(1, lrs.Count);
             lrs.RemoveLast();
-            Assert.AreEqual(lrs.Count, 0);
+            Assert.AreEqual(0, lrs.Count);
             lrs.RemoveFirst();
             lrs.RemoveLast();
             Assert.AreEqual("MULTILINESTRING ((1 1 1, 2 2 2), (3 3 3, 4 4 4))", wkt);
@@ -265,7 +265,7 @@ namespace SQLSpatialTools.UnitTests.Utility
             var vec1 = new Vector3(1, 1, 0);
             var vec2 = new Vector3(3, 3, 0);
             var angle = vec1.AngleInDegrees(vec2);
-            Assert.AreEqual(angle, 38.942441268981391);
+            Assert.AreEqual(38.942441268981391, angle);
         }
 
         [TestMethod]
@@ -273,7 +273,7 @@ namespace SQLSpatialTools.UnitTests.Utility
         {
             var lrsLine = new LRSLine(4326);
             var wkt = lrsLine.ToString();
-            Assert.AreEqual(wkt, "LINESTRING EMPTY");
+            Assert.AreEqual("LINESTRING EMPTY", wkt);
             lrsLine.AddPoint(new LRSPoint(1, 1, 0, 1, 4326));
             lrsLine.AddPoint(new LRSPoint(2, 2, null, null, 4326));
             lrsLine.LocatePoint(3);
@@ -285,7 +285,7 @@ namespace SQLSpatialTools.UnitTests.Utility
             enumerator.MoveNext();
             enumerator.MoveNext();
             var currentPoint = enumerator.Current;
-            Assert.AreEqual(currentPoint, new LRSPoint(4, 4, 0, 4, 4326));
+            Assert.AreEqual(new LRSPoint(4, 4, 0, 4, 4326), currentPoint);
             try
             {
                 enumerator.MoveNext();
@@ -302,22 +302,22 @@ namespace SQLSpatialTools.UnitTests.Utility
         public void STLinearMeasureProgressTest()
         {
             var geom = "LINESTRING EMPTY".GetGeom();
-            Assert.AreEqual(geom.STLinearMeasureProgress(), LinearMeasureProgress.None);
+            Assert.AreEqual(LinearMeasureProgress.None, geom.STLinearMeasureProgress());
 
             geom = "LINESTRING (1 1 0 1, 2 2 0 5, 3 3 0 3, 4 4 0 2, 5 5 null null)".GetGeom();
-            Assert.AreEqual(geom.STLinearMeasureProgress(), LinearMeasureProgress.None);
+            Assert.AreEqual(LinearMeasureProgress.None, geom.STLinearMeasureProgress());
 
             geom = "POINT (1 1 1 1)".GetGeom();
-            Assert.AreEqual(geom.STLinearMeasureProgress(), LinearMeasureProgress.Increasing);
+            Assert.AreEqual(LinearMeasureProgress.Increasing, geom.STLinearMeasureProgress());
 
             geom = "LINESTRING (1 1 0 0, 2 2 0 5, 3 3 0 10)".GetGeom();
-            Assert.AreEqual(geom.STLinearMeasureProgress(), LinearMeasureProgress.Increasing);
+            Assert.AreEqual(LinearMeasureProgress.Increasing, geom.STLinearMeasureProgress());
 
             geom = "LINESTRING (1 1 0 10, 2 2 0 5, 3 3 0 0)".GetGeom();
-            Assert.AreEqual(geom.STLinearMeasureProgress(), LinearMeasureProgress.Decreasing);
+            Assert.AreEqual(LinearMeasureProgress.Decreasing, geom.STLinearMeasureProgress());
 
-            Assert.AreEqual(LinearMeasureProgress.Increasing.Value(), 1);
-            Assert.AreEqual(LinearMeasureProgress.Decreasing.Value(), 2);
+            Assert.AreEqual(1, LinearMeasureProgress.Increasing.Value());
+            Assert.AreEqual(2, LinearMeasureProgress.Decreasing.Value());
         }
 
         [TestMethod]
@@ -335,10 +335,10 @@ namespace SQLSpatialTools.UnitTests.Utility
         {
             SqlGeometry geom = null;
             // ReSharper disable once ExpressionIsAlwaysNull
-            Assert.AreEqual(geom.IsNullOrEmpty(), true);
+            Assert.AreEqual(true, geom.IsNullOrEmpty());
 
             geom = "LINESTRING EMPTY".GetGeom();
-            Assert.AreEqual(geom.IsNullOrEmpty(), true);
+            Assert.AreEqual(true, geom.IsNullOrEmpty());
         }
 
         [TestMethod]

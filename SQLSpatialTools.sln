@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSpatialTools.UnitTests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{FDEEA275-E34A-465E-836C-F297B4FECDB9}"
 	ProjectSection(SolutionItems) = preProject
+		API.md = API.md
 		License.txt = License.txt
-		Readme.txt = Readme.txt
-		SpatialTools.pfx = SpatialTools.pfx
+		readme.md = readme.md
 		SQLSpatialTools.sln.DotSettings = SQLSpatialTools.sln.DotSettings
 	EndProjectSection
 EndProject

@@ -47,7 +47,7 @@ namespace SQLSpatialTools.UnitTests.Functions
                 }
                 catch (ArgumentException e)
                 {
-                    Assert.AreEqual(e.Message, ErrorMessage.WKT3DOnly);
+                    Assert.AreEqual(ErrorMessage.WKT3DOnly, e.Message);
                     TestContext.WriteLine(ErrorMessage.WKT3DOnly);
                 }
 

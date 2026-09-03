@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <SqlClrRepositoryDirectory>$(MSBuildThisFileDirectory)</SqlClrRepositoryDirectory>
+    <SqlClrSigningMode Condition="'$(SqlClrSigningMode)' == ''">None</SqlClrSigningMode>
+    <SqlClrSigningDirectory Condition="'$(SqlClrSigningDirectory)' == ''">$([MSBuild]::NormalizePath('$(SqlClrRepositoryDirectory)', '.signing'))</SqlClrSigningDirectory>
+  </PropertyGroup>
+</Project>

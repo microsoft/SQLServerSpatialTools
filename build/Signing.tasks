@@ -1,0 +1,16 @@
+<Project>
+  <UsingTask TaskName="SqlClrSigningKey"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)SqlClrSigningKey.cs" />
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="SqlClrScripts"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)SqlClrScripts.cs" />
+    </Task>
+  </UsingTask>
+</Project>
