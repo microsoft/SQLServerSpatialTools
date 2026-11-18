@@ -166,15 +166,5 @@ namespace SQLSpatialTools.KMLProcessor.Import
         }
 
         #endregion
-
-        #region Internal Properties
-
-        /// <summary>
-        /// Id which was assigned to this geography instance when it was inserted in the database. 
-        /// If the value is null then it is not stored in the database yet
-        /// </summary>
-        internal int? DbId { get; set; }
-
-        #endregion
     }
 }

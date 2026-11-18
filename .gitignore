@@ -12,3 +12,4 @@ output/
 *.user
 *.playlist
 *.CodeItRight.xml
+.signing/

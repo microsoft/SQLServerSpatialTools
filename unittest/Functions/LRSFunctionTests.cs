@@ -131,7 +131,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.TwoDimensionalCoordinates);
+                Assert.AreEqual(ErrorMessage.TwoDimensionalCoordinates, e.Message);
                 TestContext.WriteLine(ErrorMessage.TwoDimensionalCoordinates);
             }
 
@@ -244,7 +244,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.LRSCompatible);
+                Assert.AreEqual(ErrorMessage.LRSCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.LRSCompatible);
             }
 
@@ -280,7 +280,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.LRSCompatible);
+                Assert.AreEqual(ErrorMessage.LRSCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.LRSCompatible);
             }
 
@@ -323,7 +323,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.SRIDCompatible);
+                Assert.AreEqual(ErrorMessage.SRIDCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.SRIDCompatible);
             }
 
@@ -488,7 +488,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.LineStringCompatible);
+                Assert.AreEqual(ErrorMessage.LineStringCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.LineStringCompatible);
             }
 
@@ -502,7 +502,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.LineStringCompatible);
+                Assert.AreEqual(ErrorMessage.LineStringCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.LineStringCompatible);
             }
 
@@ -516,7 +516,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(e.Message, ErrorMessage.LineStringCompatible);
+                Assert.AreEqual(ErrorMessage.LineStringCompatible, e.Message);
                 TestContext.WriteLine(ErrorMessage.LineStringCompatible);
             }
 
@@ -651,10 +651,10 @@ namespace SQLSpatialTools.UnitTests.Functions
             Logger.Log("Populating Geom with Start Measure: {0} and End Measure: {1}", startMeasure, endMeasure);
             populatedGeometry = Geometry.PopulateGeometryMeasures(geom, startMeasure, endMeasure);
             Logger.Log("Populated Geom : {0}", populatedGeometry.ToString());
-            Assert.AreEqual(populatedGeometry.GetStartPointMeasure(), startMeasure);
+            Assert.AreEqual(startMeasure, populatedGeometry.GetStartPointMeasure());
             SqlAssert.AreEqual(populatedGeometry.STPointN(2).M, 20.0F);
             SqlAssert.AreEqual(populatedGeometry.STPointN(3).M, 30.0F);
-            Assert.AreEqual(populatedGeometry.GetEndPointMeasure(), endMeasure);
+            Assert.AreEqual(endMeasure, populatedGeometry.GetEndPointMeasure());
         }
 
         [TestMethod]
@@ -1053,49 +1053,49 @@ namespace SQLSpatialTools.UnitTests.Functions
             var geom2 = "MULTILINESTRING ((54.7 55 690, 100 100 3488), (121 124 4000, 200 201 5000))".GetGeom();
             var tolerance = 0.3;
             var result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.EndStart.ToString());
+            Assert.AreEqual(MergePosition.EndStart.ToString(), result);
 
             //StartStart connected
             geom1 = "MULTILINESTRING ((1 1 10, 55 55 690), (60 61 700, 71 72 800))".GetGeom();
             geom2 = "MULTILINESTRING ((1 0.8 100, 100 100 3488), (200 201 5000, 300 301 5005))".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.StartStart.ToString());
+            Assert.AreEqual(MergePosition.StartStart.ToString(), result);
 
             //StartEnd connected
             geom1 = "LINESTRING (1 1 10, 55 55 690)".GetGeom();
             geom2 = "LINESTRING (5 5 690, 0.71 1 1045)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.StartEnd.ToString());
+            Assert.AreEqual(MergePosition.StartEnd.ToString(), result);
 
             //StartEnd connected
             geom1 = "LINESTRING (1 1 10, 55 55 690)".GetGeom();
             geom2 = "POINT (1 1 100)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.StartEnd.ToString());
+            Assert.AreEqual(MergePosition.StartEnd.ToString(), result);
 
             //EndEnd connected
             geom1 = "LINESTRING (1 1 10, 55 55 690)".GetGeom();
             geom2 = "LINESTRING (5 5 690, 54.9111 55 4555)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.EndEnd.ToString());
+            Assert.AreEqual(MergePosition.EndEnd.ToString(), result);
 
             //BothEnds connected
             geom1 = "LINESTRING (1 1 10, 44 50 45, 55 55 690)".GetGeom();
             geom2 = "LINESTRING (1 1 690, 55 54.71 3488)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.BothEnds.ToString());
+            Assert.AreEqual(MergePosition.BothEnds.ToString(), result);
 
             //StartEnd connected
             geom1 = "LINESTRING (1 1 10, 55 55 690)".GetGeom();
             geom2 = "LINESTRING (55 5 5690, 1 0.87 3488)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.StartEnd.ToString());
+            Assert.AreEqual(MergePosition.StartEnd.ToString(), result);
 
             //Not connected
             geom1 = "LINESTRING (1 1 10, 55 55 690)".GetGeom();
@@ -1109,7 +1109,7 @@ namespace SQLSpatialTools.UnitTests.Functions
             geom2 = "LINESTRING (55 55 5690, 1 0.87 3488)".GetGeom();
             tolerance = 0.3;
             result = Geometry.GetMergePosition(geom1, geom2, tolerance);
-            Assert.AreEqual(result, MergePosition.CrossEnds.ToString());
+            Assert.AreEqual(MergePosition.CrossEnds.ToString(), result);
         }
 
         /// <summary>

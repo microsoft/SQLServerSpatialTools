@@ -11,9 +11,53 @@ GO
 RECONFIGURE  ;
 GO
 
-EXEC sp_configure 'clr strict security',  '0'
-RECONFIGURE WITH OVERRIDE;
-GO
+-- SQL Server 2017+: choose a trust option before registering the assembly.
+-- These examples are commented out; this script does not change CLR strict security.
+-- Run the selected setup separately as a server administrator, then return to
+-- the target database to run this registration script.
+--
+-- OPTION 1 (recommended): keep CLR strict security enabled and establish trust.
+-- EXEC sys.sp_configure 'clr strict security', 1;
+-- RECONFIGURE;
+-- GO
+--
+-- For a signed DLL, trust its signing key once in master:
+-- USE master;
+-- GO
+-- CREATE ASYMMETRIC KEY [SQLSpatialToolsSigningKey]
+-- FROM EXECUTABLE FILE = N'DLLPath';
+-- CREATE LOGIN [SQLSpatialToolsSigningLogin]
+-- FROM ASYMMETRIC KEY [SQLSpatialToolsSigningKey];
+-- GRANT UNSAFE ASSEMBLY TO [SQLSpatialToolsSigningLogin];
+-- GO
+-- Later builds signed with the same key reuse this trust. This authorizes other
+-- assemblies signed with that key too: protect the private key and never trust
+-- a shared/development key in production. Do not copy the private key to SQL Server.
+-- A signed build with SqlClrGenerateTrustScript=true generates this setup as
+-- TrustAssembly.sql. Dependencies require their own applicable trust.
+--
+-- Alternatively, trust only this exact DLL (signed or unsigned) by SHA-512 hash:
+-- USE master;
+-- GO
+-- DECLARE @assemblyHash varbinary(64);
+-- SELECT @assemblyHash = HASHBYTES('SHA2_512', BulkColumn)
+-- FROM OPENROWSET(BULK 'DLLPath', SINGLE_BLOB) AS assemblyFile;
+-- EXEC sys.sp_add_trusted_assembly @hash = @assemblyHash,
+--     @description = N'SQLSpatialTools - administrator-approved build';
+-- GO
+-- Review the DLL before approving it. Update hash-based trust whenever it changes.
+-- In both examples, DLLPath must be accessible to the SQL Server service account.
+--
+-- OPTION 2 (less secure; isolated development/test servers only):
+-- Disable CLR strict security instead of configuring the trust above.
+-- WARNING: this weakens protection SERVER-WIDE, not just for SQLSpatialTools.
+-- SAFE/EXTERNAL_ACCESS permissions are not a reliable security boundary.
+-- Do not use this option in production.
+-- EXEC sys.sp_configure 'clr strict security', 0;
+-- RECONFIGURE;
+-- GO
+-- To restore protection, configure assembly trust and set the option back to 1
+-- as shown in option 1. Untrusted assemblies may stop working when it is re-enabled.
 
 -- !!! DLL Path will be replace based upon system environment !!!
 CREATE assembly SQLSpatialTools

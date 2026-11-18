@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -22,8 +23,22 @@ namespace SQLSpatialTools.KMLProcessor.Import
         /// <param name="kml">KML string to be parsed</param>
         public KMLParser(string kml)
         {
-            Document = new XmlDocument();
-            Document.LoadXml(kml);
+            Document = new XmlDocument
+            {
+                XmlResolver = null
+            };
+
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null
+            };
+
+            using (var input = new StringReader(kml))
+            using (var reader = XmlReader.Create(input, settings))
+            {
+                Document.Load(reader);
+            }
         }
 
         #endregion
@@ -950,20 +965,6 @@ namespace SQLSpatialTools.KMLProcessor.Import
         #endregion
 
         #region Public Static Methods
-
-        /// <summary>
-        /// This method parses the given XML file context
-        /// </summary>
-        /// <param name="fileFullPathName">File full path</param>
-        /// <returns>KMLParser with loaded file context</returns>
-        public static KMLParser ParseFile(string fileFullPathName)
-        {
-            var text = System.IO.File.ReadAllText(fileFullPathName);
-
-            var p = new KMLParser(text);
-
-            return p;
-        }
 
         /// <summary>
         /// This method returns the first child element with the given name in the given parent element

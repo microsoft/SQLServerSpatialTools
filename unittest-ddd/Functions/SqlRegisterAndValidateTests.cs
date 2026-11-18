@@ -4,9 +4,9 @@
 
 using System;
 using System.Configuration;
-using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
+using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -42,7 +42,7 @@ namespace SQLSpatialTools.UnitTests.DDD
             if (_targetDir != null)
             {
                 _targetDir = _targetDir.Substring(0, _targetDir.LastIndexOf('\\'));
-                _targetDir = Path.Combine(_targetDir, "lib\\SQL Scripts");
+                _targetDir = Path.Combine(_targetDir, "lib", "net472", "SQL Scripts");
                 if (!Directory.Exists(_targetDir))
                     throw new Exception("Target Directory not found : " + _targetDir);
 

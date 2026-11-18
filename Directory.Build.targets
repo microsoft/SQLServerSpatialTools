@@ -1,0 +1,71 @@
+<Project>
+  <Import Project="$(SqlClrRepositoryDirectory)build\Signing.tasks" />
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <_SqlClrSigningActive Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' and ('$(SqlClrSigningMode)' == 'Development' or '$(SqlClrSigningMode)' == 'Production')">true</_SqlClrSigningActive>
+    <SqlClrSigningKeyFile Condition="'$(SqlClrSigningKeyFile)' == '' and '$(SqlClrSigningMode)' == 'Development'">$([System.IO.Path]::Combine('$(SqlClrSigningDirectory)', 'development.snk'))</SqlClrSigningKeyFile>
+    <SqlClrSigningKeyFile Condition="'$(SqlClrSigningKeyFile)' == '' and '$(SqlClrSigningMode)' == 'Production'">$([System.IO.Path]::Combine('$(SqlClrSigningDirectory)', 'production.snk'))</SqlClrSigningKeyFile>
+    <_SqlClrCreateDevelopmentKey>false</_SqlClrCreateDevelopmentKey>
+    <_SqlClrCreateDevelopmentKey Condition="'$(SqlClrSigningMode)' == 'Development' and '$(DesignTimeBuild)' != 'true'">true</_SqlClrCreateDevelopmentKey>
+    <SignAssembly>false</SignAssembly>
+    <SignAssembly Condition="'$(_SqlClrSigningActive)' == 'true'">true</SignAssembly>
+    <AssemblyOriginatorKeyFile />
+    <AssemblyOriginatorKeyFile Condition="'$(_SqlClrSigningActive)' == 'true'">$([MSBuild]::NormalizePath('$(SqlClrRepositoryDirectory)', '$(SqlClrSigningKeyFile)'))</AssemblyOriginatorKeyFile>
+    <PublicSign>false</PublicSign>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <Target Name="PrepareSqlClrSigning"
+          BeforeTargets="ResolveKeySource;CoreCompile"
+          Condition="'$(IsCrossTargetingBuild)' != 'true'">
+    <Error Condition="'$(SqlClrSigningMode)' != 'None' and '$(SqlClrSigningMode)' != 'Development' and '$(SqlClrSigningMode)' != 'Production'"
+           Text="SqlClrSigningMode must be None, Development, or Production." />
+    <Error Condition="('$(_SqlClrSigningActive)' == 'true' and '$(SignAssembly)' != 'true') or ('$(_SqlClrSigningActive)' != 'true' and '$(SignAssembly)' == 'true')"
+           Text="Use SqlClrSigningMode instead of overriding SignAssembly. SQL CLR signing applies only to .NET Framework targets." />
+    <Error Condition="'$(_SqlClrSigningActive)' == 'true' and ('$(PublicSign)' == 'true' or '$(DelaySign)' == 'true')"
+           Text="SQL CLR trust requires a fully signed assembly. PublicSign and DelaySign are not supported." />
+    <SqlClrSigningKey Condition="'$(_SqlClrSigningActive)' == 'true'"
+                      KeyFile="$(AssemblyOriginatorKeyFile)"
+                      CreateIfMissing="$(_SqlClrCreateDevelopmentKey)">
+      <Output TaskParameter="PublicKey" PropertyName="_SqlClrSigningPublicKey" />
+    </SqlClrSigningKey>
+    <PropertyGroup>
+      <_SqlClrSigningInputsFile>$(IntermediateOutputPath)SqlClrSigning.inputs</_SqlClrSigningInputsFile>
+    </PropertyGroup>
+    <WriteLinesToFile Condition="'$(DesignTimeBuild)' != 'true'"
+                      File="$(_SqlClrSigningInputsFile)"
+                      Lines="$(SignAssembly)|$(_SqlClrSigningPublicKey)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+    <ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
+      <CustomAdditionalCompileInputs Include="$(_SqlClrSigningInputsFile)" />
+      <FileWrites Include="$(_SqlClrSigningInputsFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GenerateSqlClrFriendAssemblies"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="PrepareSqlClrSigning"
+          Condition="'@(SqlClrFriendAssembly)' != ''">
+    <PropertyGroup>
+      <_SqlClrFriendAssemblyFile>$(IntermediateOutputPath)SqlClrFriendAssemblies.g.cs</_SqlClrFriendAssemblyFile>
+      <_SqlClrFriendPublicKeySuffix Condition="'$(_SqlClrSigningActive)' == 'true'">, PublicKey=$(_SqlClrSigningPublicKey)</_SqlClrFriendPublicKeySuffix>
+    </PropertyGroup>
+    <ItemGroup>
+      <_SqlClrFriendAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>%(SqlClrFriendAssembly.Identity)$(_SqlClrFriendPublicKeySuffix)</_Parameter1>
+      </_SqlClrFriendAttribute>
+    </ItemGroup>
+    <WriteCodeFragment AssemblyAttributes="@(_SqlClrFriendAttribute)"
+                       Language="C#"
+                       OutputFile="$(_SqlClrFriendAssemblyFile)" />
+    <ItemGroup>
+      <Compile Include="$(_SqlClrFriendAssemblyFile)" />
+      <FileWrites Include="$(_SqlClrFriendAssemblyFile)" />
+    </ItemGroup>
+  </Target>
+</Project>

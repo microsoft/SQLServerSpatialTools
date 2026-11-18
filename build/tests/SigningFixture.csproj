@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(TargetFramework)' == ''">net472;net10.0</TargetFrameworks>
+    <AssemblyName>SigningFixture</AssemblyName>
+    <OutputPath Condition="'$(SigningFixtureOutputPath)' != ''">$(SigningFixtureOutputPath)</OutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="SigningFixture.cs" />
+    <SqlClrFriendAssembly Include="SigningFixture.Friend" Condition="'$(SigningFixtureFriendAccess)' != 'false'" />
+  </ItemGroup>
+</Project>
